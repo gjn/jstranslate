@@ -1,0 +1,42 @@
+langs: [de,fr]
+dsn: dbname='bod' user='www-data' password='www-data' port=5433 host='kogis04.lt.admin.ch' 
+
+tables:
+  items:
+    table: ms_item
+    fields: [frm_designation]
+    id: itemname
+    layer: fk_layer_name 
+    frm_designation: name
+    sql: select fk_layer_name || '.' || pk_ms_item_name as itemname, *  from ms_item;
+
+  classes:
+    table: ms_class
+    fields: [frm_designation]
+    id: classname
+    layer: fk_layer_name 
+    frm_designation: name
+    sql: select  fk_layer_name || '.' || pk_ms_class_name  as classname, *  from ms_class;
+    
+  layers:
+    table: dataset
+    fields: [kurzbezeichnung,frm_abstract]
+    id: id_dataset
+    kurzbezeichnung: wms_title
+    frm_abstract:    wms_abstract
+    sql: SELECt * FROM dataset
+
+  groups:
+    table: dataset_group
+    fields: [kurzbezeichnung]
+    id: id_dataset_group
+    kurzbezeichnung: wms_group_title
+    sql: SELECt * FROM dataset_group
+
+  wms:
+    table: wms_metadata
+    fields: [title, abstract]
+    id: pk_map_name
+    title: wms_title
+    abstract: wms_abstract
+    sql: SELECT * FROM wms_metadata
