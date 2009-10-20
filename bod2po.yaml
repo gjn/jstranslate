@@ -19,12 +19,12 @@ tables:
     sql: select  fk_layer_name || '.' || pk_ms_class_name  as classname, *  from ms_class;
     
   layers:
-    table: dataset
+    table: view_dataset_translation
     fields: [kurzbezeichnung,frm_abstract]
     id: id_dataset
     kurzbezeichnung: wms_title
     frm_abstract:    wms_abstract
-    sql: SELECt * FROM dataset
+    sql: SELECt * FROM view_dataset_translation
 
   groups:
     table: dataset_group

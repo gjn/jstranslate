@@ -4,11 +4,24 @@
 
 import os, sys, subprocess
 
+from datetime import datetime
+
 try:
     import yaml
 except ImportError:
     print "You need PyYaml. Try 'easy_install pyyaml'"
     sys.exit()
+
+
+
+try:
+    from yaml import CLoader as Loader
+    from yaml import CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
+
+
 
 try:
     import psycopg2
@@ -52,6 +65,13 @@ def trim(str):
     else:
         return str
 
+def row2dict(row):
+    d = {}
+    for item in row.items():
+        if item:
+            d[item[0]] = item[1]
+    return d
+
 print config['dsn']
 try:
    conn=psycopg2.connect(config['dsn'])
@@ -67,6 +87,7 @@ conn.set_client_encoding('UTF8')
 
 for lang in config['langs']:
     catalog = Catalog(project=project, locale=lang)
+    d = {}
     for proj in config['tables']:
         print "Table: ", proj
         print "---------------------"
@@ -78,12 +99,23 @@ for lang in config['langs']:
         cur.execute(config['tables'][proj]['sql'])
 
         rows = cur.fetchall()
+
+        stream = file(proj+lang+'.yaml', 'w')
+
+        
+
+        #print yaml.dump(rows, stream)
+        r = {}
         for row in rows:
+            print row
             for field in config['tables'][proj]['fields']:
                 field_name = field + '_' + lang
                 field_value = row[field_name]
                 id = row[field_id]
                 print "Adding", id
+
+
+
                 raw_string = trim(field_value)
                 if raw_string:
                     try:
@@ -94,7 +126,10 @@ for lang in config['langs']:
                         sys.exit()
 
                     catalog.add(trim(u"%s.%s" % (id, config['tables'][proj][field])), string = cleaned_string)
-    
+            r[id] = row2dict(row)
+        
+        d[proj] = r
+
     po_filename = os.path.join(podir,"%s.%s.po"  % (project,lang))
     print po_filename        
 
@@ -115,6 +150,23 @@ for lang in config['langs']:
    
     p = subprocess.Popen(["msgfmt",'-o',mofile, po_filename],stdout=subprocess.PIPE);
     print p.communicate()[0]
+
+    
+    fn = 'wms-bod.' + lang + '.yaml'
+    print "Saving ", fn
+    stream = file(fn , 'w')
+    t =  yaml.dump(d, stream, Dumper=Dumper)
+    stream.close()
  
-    print "bod2po.py successfully terminated."
+
+
+print "bod2po.py successfully terminated."
+
+
+
+   
+
+    
+
+    
 
