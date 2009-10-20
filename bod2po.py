@@ -100,11 +100,6 @@ for lang in config['langs']:
 
         rows = cur.fetchall()
 
-        stream = file(proj+lang+'.yaml', 'w')
-
-        
-
-        #print yaml.dump(rows, stream)
         r = {}
         for row in rows:
             print row
