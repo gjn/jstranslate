@@ -11,7 +11,23 @@ except ImportError:
     sys.exit()
 
 
+try:
+    import yaml
+except ImportError:
+    print "You need PyYaml. Try 'easy_install pyyaml'"
+    sys.exit()
 
+
+
+try:
+    from yaml import CLoader as Loader
+    from yaml import CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
+
+MAXSCALEDENOM = 10000000
+MINSCALEDENOM = 1
 
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
 langid  = 'de'
@@ -26,7 +42,23 @@ def iso2utf(s):
       return s.decode('iso-8859-1').encode('utf-8') 
 
 def uni2iso(s):
-      return s.encode('iso-8859-1','replace') 
+      return s.encode('iso-8859-1','replace')
+
+
+def setScale(object, key='minscaledenom',value=None):
+    """ si value > 0 --> replace
+        si  value est None --> rien
+        si value <0 --> effacer la valeur du mapfile
+    """
+    if value is None: return
+
+    if value > 0:
+        setattr(object,key, int(value))
+    else:
+        if key =='maxscaledenom':
+            setattr(object,key, MAXSCALEDENOM)
+        else:
+            setattr(object,key, MINSCALEDENOM)
 
 def localizeMapfile(project, langs=['fr','de'], projdir = None):
     map = None
@@ -42,6 +74,18 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
             #print translation.info()
             _ = translation.ugettext
 
+            fn = 'wms-bod.' + lang + '.yaml'
+            print "Opening ", fn
+            stream = file(fn , 'r')
+            try:
+                bodDict =  yaml.load(stream, Loader=Loader)
+
+            except:
+                print "Critical error: Cannot read '%s'. Exit" % fn
+                sys.exit()
+            finally:
+                stream.close()
+
 
             print _("ch.swisstopo.gg25-gemeinde-grenze.title")
 
@@ -51,11 +95,36 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
             localized_mapfilename = os.path.abspath(os.path.join(project_dir,project + '.' + lang +'.map'))
 
             
+            # mapfile translation
+            #clone_map.metadata.set('wms_title', uni2iso(_('wms-bod.wms_title')))
+            #clone_map.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
 
 
             for i in range(0, clone_map.numlayers - 1):
                 lyr = clone_map.getLayer(i)
                 if lyr:
+                    # Layer fixing
+                    if lyr.name in bodDict['layers'].keys():
+                        gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
+                        if gml_include_items:
+                            lyr.metadata.set('gml_include_items', gml_include_items)
+                        
+                        setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
+                        setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
+
+                        group_id  = bodDict['layers'][lyr.name]['group_id']
+                        if group_id:
+                            lyr.group = group_id
+                            lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')))
+                        else:
+                              lyr.group = None
+
+                        lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['fk_datasource_id'] )
+
+
+
+
+                    # layer translation
                     lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
                     #print _(u''+lyr.name+'.title')
                     print  t(lyr.name+'.title')
@@ -75,6 +144,15 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
                         if klass and klass.name:
+                            # Fix scales
+                            klassid = lyr.name + "." + klass.name.decode('utf-8','replace')
+                            if klassid in bodDict['classes'].keys():
+                                setScale(lyr, key='minscaledenom',value= bodDict['classes'][klassid]['ms_minscaledenom'])
+                                setScale(lyr, key='maxscaledenom',value= bodDict['classes'][klassid]['ms_maxscaledenom'])
+
+
+
+
                             #klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
                             klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
 
