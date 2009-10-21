@@ -102,7 +102,7 @@ for lang in config['langs']:
 
         r = {}
         for row in rows:
-            print row
+            #print row
             for field in config['tables'][proj]['fields']:
                 field_name = field + '_' + lang
                 field_value = row[field_name]
