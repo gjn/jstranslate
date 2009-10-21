@@ -36,7 +36,7 @@ tables:
   wms:
     table: wms_metadata
     fields: [title, abstract]
-    id: pk_map_name
+    id: project
     title: wms_title
     abstract: wms_abstract
-    sql: SELECT * FROM wms_metadata
+    sql: SELECT substring('/var/www/services/wms-bod/wms-bod.map' from '([a-z_-]+)\.map') as project, * FROM wms_metadata
