@@ -43,7 +43,8 @@ def iso2utf(s):
       return s.decode('iso-8859-1').encode('utf-8') 
 
 def uni2iso(s):
-      return s.encode('iso-8859-1','replace')
+
+      return s.encode('iso-8859-1','replace').replace("\"","'")
 
 
 def setScale(object, key='minscaledenom',value=None):
