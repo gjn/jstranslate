@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os.path, sys
-import gettext
+
+import os.path, sys, shutil
+import gettext, codecs
 
 try:
     import mapscript
@@ -60,6 +61,30 @@ def setScale(object, key='minscaledenom',value=None):
         else:
             setattr(object,key, MINSCALEDENOM)
 
+
+def convert_to_utf8(filename):
+    try:
+        f = open(filename,'r')
+        data = uniocde(f.read(),'iso-8859-1')
+    except Exception:
+        sys.exit(1)
+
+
+    newfilename = filename + '.bak'
+
+    shutil.copy(filename,newfilename)
+
+    f = open(filename,'w')
+    try:
+        data = "# Automatically generated mapfile. Do not edit!\n\n" + data
+        #f.write(data.encode('utf-8'))
+        f.write(data.encode('utf-8'))
+
+    except Exception, e:
+        print e
+    finally:
+        f.close()
+
 def localizeMapfile(project, langs=['fr','de'], projdir = None):
     map = None
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
@@ -96,8 +121,9 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
 
             
             # mapfile translation
-            #clone_map.metadata.set('wms_title', uni2iso(_('wms-bod.wms_title')))
-            #clone_map.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
+            clone_map.web.metadata.set('wms_title', uni2iso(_('wms-bod.wms_title')))
+            clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
+            clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
 
 
             for i in range(0, clone_map.numlayers - 1):
@@ -118,6 +144,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                             lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')))
                         else:
                               lyr.group = None
+                              if lyr.metadata.get('wms_group_title'):
+                                lyr.metadata.remove('wms_group_title')
 
                         lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['fk_datasource_id'] )
 
@@ -173,6 +201,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
       
             s = iso2utf(open(localized_mapfilename).read())
             open(localized_mapfilename, 'w').write(s)
+            #convert_to_utf8(localized_mapfilename)
+
     else:
         print "Error opening", mapfile_tpl
                 
