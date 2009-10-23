@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-*- encoding: utf8 -*-
 
 import os, sys, subprocess
 
@@ -65,6 +64,15 @@ def trim(str):
     else:
         return str
 
+def cleanup(name, replace={u'’':'\'',u'–':'-',u'œ':'oe', u'„':'\'', u'“':'\'',u'«':'\'', u'»':'\''  }):
+    if name:
+        for k, v in replace.items():
+            name = name.replace(k, v)
+    return name
+
+
+
+
 def row2dict(row):
     d = {}
     for item in row.items():
@@ -111,12 +119,12 @@ for lang in config['langs']:
 
 
 
-                raw_string = trim(field_value)
+                raw_string = cleanup(trim(field_value))
                 if raw_string:
                     try:
                         cleaned_string = raw_string.encode('iso-8859-1').decode('iso-8859-1')
                     except UnicodeEncodeError:
-                        msg = u"Error!\nThe string \"%s\" contains illegal character(s).\nPlease check the table \"%s\" and correct id=%s (illegal character(s) replaced by '?').\nExit" % (raw_string,pg_table,id)
+                        msg = u"""\n----ERROR!----\n\nThe string \"%s\"\n\ncontains illegal character(s).\nPlease check the field "%s"\nin table \"%s\"\nwith id=%s (illegal character(s) replaced by '?').\nExit""" % (raw_string,field_name,pg_table,id)
                         print msg.encode('iso-8859-1','replace')
                         sys.exit()
 

@@ -20,18 +20,20 @@ tables:
     
   layers:
     table: view_dataset_translation
-    fields: [kurzbezeichnung,frm_abstract,grp_kurzbezeichnung]
+    fields: [kurzbezeichnung,frm_abstract,grp_kurzbezeichnung,grp_abstract]
     id: id_dataset
     kurzbezeichnung: wms_title
     frm_abstract:    wms_abstract
     grp_kurzbezeichnung: wms_group_title
+    grp_abstract: wms_group_abstract
     sql: SELECt * FROM view_dataset_translation
 
   groups:
     table: dataset_group
-    fields: [kurzbezeichnung]
+    fields: [kurzbezeichnung,frm_abstract]
     id: id_dataset_group
     kurzbezeichnung: wms_group_title
+    frm_abstract: wms_group_abstract
     sql: SELECt * FROM dataset_group
 
   wms:
