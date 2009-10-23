@@ -143,6 +143,10 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                         if group_id:
                             lyr.group = group_id
                             lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')))
+                            lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.name+'.wms_group_abstract')))
+
+                            
+                            
                         else:
                               lyr.group = None
                               if lyr.metadata.get('wms_group_title'):
@@ -153,11 +157,19 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
 
 
 
-                    # layer translation
-                    lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
+                    # layer translation, if group take title and absctract from group
+                    if lyr.group and _(lyr.name+'.wms_title') == lyr.name+'.wms_title':
+                        lyr.metadata.set('wms_title',uni2iso(_(lyr.name+'.wms_group_title')))
+                    else:
+                        lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
                     #print _(u''+lyr.name+'.title')
+
+                    if lyr.group and _(lyr.name+'.wms_abstract') == lyr.name+'.wms_abstract':
+                        lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
+                    else:
+                        lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
+
                     print  t(lyr.name+'.title')
-                    lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
                     print _(lyr.name+'.abstract')
 
 
