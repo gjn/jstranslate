@@ -152,7 +152,7 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                               if lyr.metadata.get('wms_group_title'):
                                 lyr.metadata.remove('wms_group_title')
 
-                        lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['fk_datasource_id'] )
+                        lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['datasource'] )
 
 
 
