@@ -30,9 +30,14 @@ except ImportError:
 MAXSCALEDENOM = 10000000
 MINSCALEDENOM = 1
 
+WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
+
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
 langid  = 'de'
 domain = 'wms-bod'  # for layers.mo
+
+# OPACITY 100 is default. Do not show in Mapfile.
+transparency = opacity = 100
 
 print localedir
 
@@ -130,7 +135,15 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
             for i in range(0, clone_map.numlayers - 1):
                 lyr = clone_map.getLayer(i)
                 if lyr:
-                    # Layer fixing
+                    # Layer stuff and fixing
+                    if lyr.name == WATERMARK_LAYERNAME:
+                        opacity = transparency = 100
+                    else:
+                        opacity = transparency = 100
+                        
+                    lyr.opacity = opacity
+                    lyr.transparency = transparency
+
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
                         if gml_include_items:
@@ -181,7 +194,7 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                             item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
                             lyr.metadata.set(item_alias, item_translation)
 
-                    
+                    # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
                         if klass and klass.name:
@@ -192,7 +205,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                                 setScale(lyr, key='maxscaledenom',value= bodDict['classes'][klassid]['ms_maxscaledenom'])
 
 
-
+                            klass.opacity = opacity
+                            klass.transparency = transparency
 
                             #klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
                             klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
