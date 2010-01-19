@@ -137,7 +137,7 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                 if lyr:
                     # Layer stuff and fixing
                     if lyr.name == WATERMARK_LAYERNAME:
-                        opacity = transparency = 100
+                        opacity = transparency = lyr.opacity
                     else:
                         opacity = transparency = 100
                         
