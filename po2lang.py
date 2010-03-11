@@ -102,6 +102,7 @@ def convert_to_utf8(filename):
 
 def localizeMapfile(project, langs=['fr','de'], projdir = None):
     map = None
+    domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
     proj_version = getSvnVersion(project_dir)
     print  proj_version
@@ -117,7 +118,7 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
             #print translation.info()
             _ = translation.ugettext
 
-            fn = 'wms-bod.' + lang + '.yaml'
+            fn = project + '.' + lang + '.yaml'
             print "Opening ", fn
             stream = file(fn , 'r')
             try:
@@ -247,5 +248,9 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                 
 
 if __name__ == '__main__':
-   localizeMapfile('wms-bod')
+   if not sys.argv[1:]:
+        sys.stdout.write("Sorry, you must specify one argument, for instance wms-bod")
+	sys.exit(0)
+   else:
+      localizeMapfile(sys.argv[1])
 
