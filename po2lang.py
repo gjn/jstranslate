@@ -4,6 +4,7 @@
 
 import os.path, sys, shutil
 import gettext, codecs
+import subprocess
 
 try:
     import mapscript
@@ -52,6 +53,14 @@ def uni2iso(s):
       return s.encode('iso-8859-1','replace').replace("\"","'")
 
 
+def getSvnVersion(proj_dir):
+    p = subprocess.Popen("svnversion %s" %  proj_dir,
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    outputlines = p.stdout.readlines()
+    
+    return outputlines[0].strip()
+
+
 def setScale(object, key='minscaledenom',value=None):
     """ si value > 0 --> replace
         si  value est None --> rien
@@ -94,6 +103,9 @@ def convert_to_utf8(filename):
 def localizeMapfile(project, langs=['fr','de'], projdir = None):
     map = None
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
+    proj_version = getSvnVersion(project_dir)
+    print  proj_version
+
     mapfile_tpl = os.path.join(project_dir, project + '.map')
     if os.path.isfile(mapfile_tpl):
         map = mapscript.mapObj(mapfile_tpl)
@@ -127,8 +139,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
 
             
             # mapfile translation
-            clone_map.web.metadata.set('wms_title', uni2iso(_('wms-bod.wms_title')))
             clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
+            clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract') + " (Revision: %s)" % proj_version))
             clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
 
 
