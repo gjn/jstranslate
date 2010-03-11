@@ -38,6 +38,12 @@ except ImportError:
 
 project = 'wms-bod'
 
+if sys.argv[1:]:
+     project = sys.argv[1]
+               
+print "Processing ", project
+
+
 projdir = os.path.abspath(os.path.join('..',os.path.dirname(__file__)))
 podir = os.path.join(projdir,'po')
 
@@ -155,7 +161,7 @@ for lang in config['langs']:
     print p.communicate()[0]
 
     
-    fn = 'wms-bod.' + lang + '.yaml'
+    fn = project +'.' + lang + '.yaml'
     print "Saving ", fn
     stream = file(fn , 'w')
     t =  yaml.dump(d, stream, Dumper=Dumper)
