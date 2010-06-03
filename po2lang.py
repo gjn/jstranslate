@@ -30,6 +30,7 @@ except ImportError:
 
 MAXSCALEDENOM = 10000000
 MINSCALEDENOM = 1
+MAX_EXTENT = "100000 50000 850000 400000"
 
 WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
 
@@ -100,7 +101,7 @@ def convert_to_utf8(filename):
     finally:
         f.close()
 
-def localizeMapfile(project, langs=['fr','de'], projdir = None):
+def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
     map = None
     domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
@@ -110,7 +111,10 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
     mapfile_tpl = os.path.join(project_dir, project + '.map')
     if os.path.isfile(mapfile_tpl):
         map = mapscript.mapObj(mapfile_tpl)
+
     if map:
+        max_extent = map.getMetaData("wms_extent") or MAX_EXTENT 
+        print "Max extent", max_extent
         for lang in langs:
 
             translation = gettext.translation(domain,localedir, languages=[lang])
@@ -118,7 +122,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
             #print translation.info()
             _ = translation.ugettext
 
-            fn = project + '.' + lang + '.yaml'
+            # fn = project + '.' + lang + '.yaml'
+            fn = 'wms-bod.' + lang + '.yaml' # for all project
             print "Opening ", fn
             stream = file(fn , 'r')
             try:
@@ -161,7 +166,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
                         if gml_include_items:
                             lyr.metadata.set('gml_include_items', gml_include_items)
-                        
+                            lyr.metadata.set('wms_include_items', gml_include_items)
+    
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
 
@@ -179,7 +185,16 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                                 lyr.metadata.remove('wms_group_title')
 
                         lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['datasource'] )
-
+                    # Status
+                    lyr.status = mapscript.MS_OFF
+                    # Template (queryable) 
+                    lyr.template = 'ttt'
+                    lyr.labelmaxscaledenom = 2.0
+                    lyr.labelminscaledenom = 1.0
+                    
+                    extent = lyr.metadata.get("wms_extent")
+                    if not extent:
+                        lyr.metadata.set("wms_extent", max_extent)
 
 
 
@@ -203,10 +218,11 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
                     if items:
                         for item in items.split(','):
                             item = item.strip()
-                            item_alias = "gml_%s_alias" % item
+                            gml_item_alias = "gml_%s_alias" % item
+                            wms_item_alias = "wms_%s_alias" % item
                             item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
-                            lyr.metadata.set(item_alias, item_translation)
-
+                            lyr.metadata.set(gml_item_alias, item_translation)
+                            lyr.metadata.set(wms_item_alias, item_translation)
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
@@ -249,8 +265,8 @@ def localizeMapfile(project, langs=['fr','de'], projdir = None):
 
 if __name__ == '__main__':
    if not sys.argv[1:]:
-        sys.stdout.write("Sorry, you must specify one argument, for instance wms-bod")
-	sys.exit(0)
+       sys.stdout.write("Sorry, you must specify one argument, for instance wms-bod")
+       sys.exit(0)
    else:
       localizeMapfile(sys.argv[1])
 
