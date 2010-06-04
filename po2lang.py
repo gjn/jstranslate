@@ -197,17 +197,20 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         lyr.metadata.set("wms_extent", max_extent)
 
 
+                    if project == 'wms-bod':
+                        # layer translation, if group take title and absctract from group
+                        if lyr.group and _(lyr.name+'.wms_title') == lyr.name+'.wms_title':
+                            lyr.metadata.set('wms_title',uni2iso(_(lyr.name+'.wms_group_title')))
+                        else:
+                            lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
+                        #print _(u''+lyr.name+'.title')
 
-                    # layer translation, if group take title and absctract from group
-                    if lyr.group and _(lyr.name+'.wms_title') == lyr.name+'.wms_title':
-                        lyr.metadata.set('wms_title',uni2iso(_(lyr.name+'.wms_group_title')))
+                        if lyr.group and _(lyr.name+'.wms_abstract') == lyr.name+'.wms_abstract':
+                            lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
+                        else:
+                            lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
                     else:
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
-                    #print _(u''+lyr.name+'.title')
-
-                    if lyr.group and _(lyr.name+'.wms_abstract') == lyr.name+'.wms_abstract':
-                        lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
-                    else:
                         lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
 
                     print  t(lyr.name+'.title')
