@@ -122,8 +122,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             #print translation.info()
             _ = translation.ugettext
 
-            # fn = project + '.' + lang + '.yaml'
-            fn = 'wms-bod.' + lang + '.yaml' # for all project
+            fn = project + '.' + lang + '.yaml'
+            #fn = 'wms-bod.' + lang + '.yaml' # for all project
             print "Opening ", fn
             stream = file(fn , 'r')
             try:
