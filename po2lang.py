@@ -34,6 +34,10 @@ MAX_EXTENT = "100000 50000 850000 400000"
 
 WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
 
+
+WMS_SRS = "EPSG:4326 EPSG:21780 EPSG:21781 EPSG:21782 EPSG:2056 EPSG:4230 EPSG:4258 EPSG:3034 EPSG:3035 EPSG:3043 EPSG:3044 EPSG:25831 EPSG:25832 EPSG:25833 EPSG:2154 EPSG:32631 EPSG:32632 EPSG:4807 EPSG:4275 EPSG:27562 EPSG:27572 EPSG:2192 EPSG:4314 EPSG:31466 EPSG:31467 EPSG:4670 EPSG:3064 EPSG:3065 EPSG:3003 EPSG:3004 EPSG:32631 EPSG:32632 EPSG:23031 EPSG:23032 EPSG:3416 EPSG:31251 EPSG:31254 EPSG:31257 EPSG:4171 EPSG:4151"
+
+
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
 langid  = 'de'
 domain = 'wms-bod'  # for layers.mo
@@ -148,6 +152,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
             clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract') + " (Revision: %s)" % proj_version))
             clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
+            if project == 'wms-bgdi':
+                clone_map.web.metadata.set('wms_srs', WMS_SRS)
 
 
             for i in range(0, clone_map.numlayers - 1):
@@ -189,8 +195,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                     lyr.status = mapscript.MS_OFF
                     # Template (queryable) 
                     lyr.template = 'ttt'
-                    lyr.labelmaxscaledenom = 2.0
-                    lyr.labelminscaledenom = 1.0
                     
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
@@ -209,9 +213,19 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
                         else:
                             lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
+                        # No labels
+                        lyr.labelmaxscaledenom = 2.0
+                        lyr.labelminscaledenom = 1.0
                     else:
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
                         lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
+                        lyr.metadata.set('wms_srs', WMS_SRS)
+                        maxscaledenom = lyr.maxscaledenom
+                        if maxscaledenom < 0:
+                            lyr.maxscaledenom = MAXSCALEDENOM
+                        minscaledenom = lyr.minscaledenom
+                        if minscaledenom < 0:
+                            lyr.minscaledenom = MINSCALEDENOM
 
                     print  t(lyr.name+'.title')
                     print _(lyr.name+'.abstract')
@@ -233,8 +247,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             # Fix scales
                             klassid = lyr.name + "." + klass.name.decode('utf-8','replace')
                             if klassid in bodDict['classes'].keys():
-                                setScale(lyr, key='minscaledenom',value= bodDict['classes'][klassid]['ms_minscaledenom'])
-                                setScale(lyr, key='maxscaledenom',value= bodDict['classes'][klassid]['ms_maxscaledenom'])
+                                setScale(klass, key='minscaledenom',value= bodDict['classes'][klassid]['ms_minscaledenom'])
+                                setScale(klass, key='maxscaledenom',value= bodDict['classes'][klassid]['ms_maxscaledenom'])
 
 
                             klass.opacity = opacity
