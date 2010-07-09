@@ -156,7 +156,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
 
 
-            for i in range(0, clone_map.numlayers - 1):
+            for i in range(0, clone_map.numlayers):
                 lyr = clone_map.getLayer(i)
                 if lyr:
                     # Layer stuff and fixing
