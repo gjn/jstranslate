@@ -5,7 +5,7 @@
 import os.path, sys, shutil
 import gettext, codecs
 import subprocess
-
+import version
 try:
     import mapscript
 except ImportError:
@@ -28,6 +28,7 @@ except ImportError:
     from yaml import Loader, Dumper
 
 
+
 MAXSCALEDENOM = 10000000
 MINSCALEDENOM = 1
 MAX_EXTENT = "100000 50000 850000 400000"
@@ -35,8 +36,13 @@ MAX_EXTENT = "100000 50000 850000 400000"
 WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
 
 
+# Full list
 WMS_SRS = "EPSG:4326 EPSG:21780 EPSG:21781 EPSG:21782 EPSG:2056 EPSG:4230 EPSG:4258 EPSG:3034 EPSG:3035 EPSG:3043 EPSG:3044 EPSG:25831 EPSG:25832 EPSG:25833 EPSG:2154 EPSG:32631 EPSG:32632 EPSG:4807 EPSG:4275 EPSG:27562 EPSG:27572 EPSG:2192 EPSG:4314 EPSG:31466 EPSG:31467 EPSG:4670 EPSG:3064 EPSG:3065 EPSG:3003 EPSG:3004 EPSG:32631 EPSG:32632 EPSG:23031 EPSG:23032 EPSG:3416 EPSG:31251 EPSG:31254 EPSG:31257 EPSG:4171 EPSG:4151"
 
+WMS_= "EPSG:4979 EPSG:4326 EPSG:900913 EPSG:3857 EPSG:3395 EPSG:32631 EPSG:32632 EPSG:4258 EPSG:4230 EPSG:3035 EPSG:3034 EPSG:3043 EPSG:3044 EPSG:4171 EPSG:4807 EPSG:2154 EPSG:32631 EPSG:32632 EPSG:27572 EPSG:4314 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:31469 EPSG:2398 EPSG:2399 EPSG:25832 EPSG:25833 EPSG:4670 EPSG:3064 EPSG:3065 EPSG:4265 EPSG:3003 EPSG:3004 EPSG:3416 EPSG:31251 EPSG:31254 EPSG:31257 EPSG:31287 EPSG:31297 EPSG:21781 EPSG:21782 EPSG:21780 EPSG:2056 EPSG:4151"
+
+# Smaller list, for IGN
+WMS_SRS = "EPSG:4326 EPSG:21781 EPSG:2056 EPSG:3034 EPSG:3035 EPSG:4258 EPSG:900913"
 
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
 langid  = 'de'
@@ -62,8 +68,8 @@ def getSvnVersion(proj_dir):
     p = subprocess.Popen("svnversion %s" %  proj_dir,
     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     outputlines = p.stdout.readlines()
-    
-    return outputlines[0].strip()
+
+    return filter(str.isdigit, outputlines[0])
 
 
 def setScale(object, key='minscaledenom',value=None):
@@ -85,7 +91,7 @@ def setScale(object, key='minscaledenom',value=None):
 def convert_to_utf8(filename):
     try:
         f = open(filename,'r')
-        data = uniocde(f.read(),'iso-8859-1')
+        data = unicode(f.read(),'iso-8859-1')
     except Exception:
         sys.exit(1)
 
@@ -109,7 +115,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
     map = None
     domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
-    proj_version = getSvnVersion(project_dir)
+    proj_version = version.get_svn_revision(project_dir)
     print  proj_version
 
     mapfile_tpl = os.path.join(project_dir, project + '.map')
@@ -140,7 +146,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                 stream.close()
 
 
-            print _("ch.swisstopo.gg25-gemeinde-grenze.title")
+            # print _("ch.swisstopo.gg25-gemeinde-grenze.title")
 
 
 
@@ -149,14 +155,22 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
 
             
             # mapfile translation
-            clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
-            clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract') + " (Revision: %s)" % proj_version))
+#            key = clone_map.web.metadata.nextKey(None)
+#            while key is not None:
+#                value = clone_map.web.metadata.get(key)
+#                clone_map.web.metadata.set(key, value ) #uni2iso(value))
+#                key = clone_map.web.metadata.nextKey(key)
+                
+            # clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
+            clone_map.web.metadata.set('wms_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
             clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
+            clone_map.web.metadata.set('wms_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
+            clone_map.web.metadata.set('wms_title', uni2iso(_(project + '.wms_title')))
             if project == 'wms-bgdi':
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
 
 
-            for i in range(0, clone_map.numlayers):
+            for i in range(0, clone_map.numlayers - 1):
                 lyr = clone_map.getLayer(i)
                 if lyr:
                     # Layer stuff and fixing
@@ -170,9 +184,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
 
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
-                        if gml_include_items:
-                            lyr.metadata.set('gml_include_items', gml_include_items)
-                            lyr.metadata.set('wms_include_items', gml_include_items)
+                        #if gml_include_items:
+                            # lyr.metadata.set('gml_include_items', gml_include_items)
+                            # item value contains sometime invalid character
+                            # lyr.metadata.set('wms_include_items', gml_include_items)
     
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
@@ -238,8 +253,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             gml_item_alias = "gml_%s_alias" % item
                             wms_item_alias = "wms_%s_alias" % item
                             item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
-                            lyr.metadata.set(gml_item_alias, item_translation)
-                            lyr.metadata.set(wms_item_alias, item_translation)
+                            # lyr.metadata.set(gml_item_alias, item_translation)
+                            # lyr.metadata.set(wms_item_alias, item_translation)
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
