@@ -44,6 +44,11 @@ WMS_= "EPSG:4979 EPSG:4326 EPSG:900913 EPSG:3857 EPSG:3395 EPSG:32631 EPSG:32632
 # Smaller list, for IGN
 WMS_SRS = "EPSG:4326 EPSG:21781 EPSG:2056 EPSG:3034 EPSG:3035 EPSG:4258 EPSG:900913"
 
+
+# Trusted ecogis!
+WMS_SRS = "EPSG:21781 EPSG:2056 EPSG:4326 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:25832 EPSG:27582 EPSG:26591 EPSG:26592 EPSG:900913"
+
+
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
 langid  = 'de'
 domain = 'wms-bod'  # for layers.mo
