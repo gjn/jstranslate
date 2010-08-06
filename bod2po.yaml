@@ -1,5 +1,5 @@
 langs: [de,fr]
-dsn: dbname='bod' user='www-data' password='www-data' port=5433 host='kogis04.lt.admin.ch' 
+dsn: dbname='bod' user='www-data' password='www-data' port=5432 host='localhost' 
 
 tables:
   items:

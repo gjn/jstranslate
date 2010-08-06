@@ -41,12 +41,13 @@ WMS_SRS = "EPSG:4326 EPSG:21780 EPSG:21781 EPSG:21782 EPSG:2056 EPSG:4230 EPSG:4
 
 WMS_= "EPSG:4979 EPSG:4326 EPSG:900913 EPSG:3857 EPSG:3395 EPSG:32631 EPSG:32632 EPSG:4258 EPSG:4230 EPSG:3035 EPSG:3034 EPSG:3043 EPSG:3044 EPSG:4171 EPSG:4807 EPSG:2154 EPSG:32631 EPSG:32632 EPSG:27572 EPSG:4314 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:31469 EPSG:2398 EPSG:2399 EPSG:25832 EPSG:25833 EPSG:4670 EPSG:3064 EPSG:3065 EPSG:4265 EPSG:3003 EPSG:3004 EPSG:3416 EPSG:31251 EPSG:31254 EPSG:31257 EPSG:31287 EPSG:31297 EPSG:21781 EPSG:21782 EPSG:21780 EPSG:2056 EPSG:4151"
 
+# Trusted ecogis!
+WMS_SRS = "EPSG:21781 EPSG:2056 EPSG:4326 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:25832 EPSG:27582 EPSG:26591 EPSG:26592 EPSG:900913"
+
 # Smaller list, for IGN
 WMS_SRS = "EPSG:4326 EPSG:21781 EPSG:2056 EPSG:3034 EPSG:3035 EPSG:4258 EPSG:900913"
 
 
-# Trusted ecogis!
-WMS_SRS = "EPSG:21781 EPSG:2056 EPSG:4326 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:25832 EPSG:27582 EPSG:26591 EPSG:26592 EPSG:900913"
 
 
 localedir = os.path.join( os.path.abspath(os.path.join(os.curdir,'..', "locale")))
@@ -56,7 +57,7 @@ domain = 'wms-bod'  # for layers.mo
 # OPACITY 100 is default. Do not show in Mapfile.
 transparency = opacity = 100
 
-print localedir
+
 
 def t(input):
     return _(input)
@@ -121,11 +122,17 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
     domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
     proj_version = version.get_svn_revision(project_dir)
-    print  proj_version
+    print  "Translating", project
+    print "===================="
+    print "SVN version: ", proj_version
+    print "Locales (.mo) are in", localedir
 
     mapfile_tpl = os.path.join(project_dir, project + '.map')
+    
     if os.path.isfile(mapfile_tpl):
         map = mapscript.mapObj(mapfile_tpl)
+        print "Using mapfile ", mapfile_tpl
+        print "Languages: ", ",".join(langs)
 
     if map:
         max_extent = map.getMetaData("wms_extent") or MAX_EXTENT 
@@ -137,9 +144,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             #print translation.info()
             _ = translation.ugettext
 
+            s = 'ch.swisstopo.vec25-heckenbaeume-linien.Hecke.name'
+            print "Test translation:", s," --> ",  _(s)
+            
             fn = project + '.' + lang + '.yaml'
             #fn = 'wms-bod.' + lang + '.yaml' # for all project
-            print "Opening ", fn
+            print "Opening %s (be patient)" % fn
             stream = file(fn , 'r')
             try:
                 bodDict =  yaml.load(stream, Loader=Loader)
@@ -150,8 +160,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             finally:
                 stream.close()
 
-
-            # print _("ch.swisstopo.gg25-gemeinde-grenze.title")
 
 
 
@@ -247,8 +255,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         if minscaledenom < 0:
                             lyr.minscaledenom = MINSCALEDENOM
 
-                    print  t(lyr.name+'.title')
-                    print _(lyr.name+'.abstract')
+                    # print  t(lyr.name+'.title')
+                    # print _(lyr.name+'.abstract')
 
 
                     items = lyr.metadata.get("gml_include_items")
@@ -258,8 +266,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             gml_item_alias = "gml_%s_alias" % item
                             wms_item_alias = "wms_%s_alias" % item
                             item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
-                            # lyr.metadata.set(gml_item_alias, item_translation)
-                            # lyr.metadata.set(wms_item_alias, item_translation)
+                            lyr.metadata.set(gml_item_alias, item_translation)
+                            lyr.metadata.set(wms_item_alias, item_translation)
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
@@ -275,11 +283,17 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             klass.transparency = transparency
 
                             #klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
-                            klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
+                            # ch.swisstopo.vec200-names-namedlocation.Tunnel.name
+                            # ch.swisstopo.vec25-heckenbaeume-linien.Hecke.name
+                            # klassid=ch.swisstopo.vec25-heckenbaeume_linien.Hecke, klass.name=Hecke
 
-                            print "CLASS,",  klassname.encode('ascii','replace')
+                            #print "klassid=%s, klass.name=%s" % (klassid,klass.name)
+                            klassname = klassid + ".name"
+                            print klassname
+                            #print "CLASS, id=%s" % klassname
                             klass.name =uni2iso( _(klassname))  #.encode('ascii','replace')))
-                            
+                            #if klassname == klass.name:
+                            #   print "Missing translation for", klassname
                             
 
            
