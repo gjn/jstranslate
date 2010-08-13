@@ -40,7 +40,6 @@ class Mapfilize():
 	
 	def initLayers(self):
 		cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        	#cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%wms-bgdi%' ORDER BY fk_id_dataset DESC")
         	cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%wms-bgdi%' ORDER BY 'ch.'||split_part(fk_id_dataset,'.',2)||'.' DESC ,sort_key DESC")
 
         	for row in  cur.fetchall():
