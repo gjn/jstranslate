@@ -65,7 +65,7 @@ class Mapfilize():
             		FILE = open(filename,"w")
             		FILE.writelines(renderedTpl.encode('utf-8'))
             		FILE.close()
-            		print "mapfile created successfully"
+            		print "Mapfile written successfullyi to %s" %  filename
             		return True
 		print "mapfile creation failed!!!"        
 
