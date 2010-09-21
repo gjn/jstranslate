@@ -47,6 +47,8 @@ WMS_SRS = "EPSG:21781 EPSG:2056 EPSG:4326 EPSG:31466 EPSG:31467 EPSG:31468 EPSG:
 # Smaller list, for IGN
 WMS_SRS = "EPSG:4326 EPSG:21781 EPSG:2056 EPSG:3034 EPSG:3035 EPSG:4258 EPSG:900913"
 
+# Smaller list, but also for D/A/CH/I
+WMS_SRS = "EPSG:4326 EPSG:21781 EPSG:2056 EPSG:3034 EPSG:3035 EPSG:4258 EPSG:900913 EPSG:31287 EPSG:25832 EPSG:25833 EPSG:31467 EPSG:32632 EPSG:32633"
 
 
 
@@ -139,7 +141,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
         print "Max extent", max_extent
         for lang in langs:
 
-            translation = gettext.translation(domain,localedir, languages=[lang])
+            try:
+               translation = gettext.translation(domain,localedir, languages=[lang])
+            except IOError, e:
+               print "Error! Cannot initialize translation", e
+               print "Try to run bod2po.py first"
+               sys.exit()
             translation.install(unicode=1)
             #print translation.info()
             _ = translation.ugettext
@@ -197,10 +204,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
 
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
-                        #if gml_include_items:
-                            # lyr.metadata.set('gml_include_items', gml_include_items)
-                            # item value contains sometime invalid character
-                            # lyr.metadata.set('wms_include_items', gml_include_items)
+                        if gml_include_items:
+                             lyr.metadata.set('gml_include_items', gml_include_items)
+                             #item value contains sometime invalid character
+                             lyr.metadata.set('wms_include_items', gml_include_items)
     
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
