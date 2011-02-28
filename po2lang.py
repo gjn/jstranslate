@@ -3,6 +3,7 @@
 
 
 import os.path, sys, shutil
+import re
 import gettext, codecs
 import subprocess
 import version
@@ -70,6 +71,11 @@ def iso2utf(s):
 def uni2iso(s):
 
       return s.encode('iso-8859-1','replace').replace("\"","'")
+
+def xmlnamify(s):
+   s = re.sub(r"\[|\]", '', s)
+   s = re.sub(r"\s+", '_', s)
+   return s
 
 
 def getSvnVersion(proj_dir):
@@ -275,8 +281,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             gml_item_alias = "gml_%s_alias" % item
                             wms_item_alias = "wms_%s_alias" % item
                             item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
-                            lyr.metadata.set(gml_item_alias, item_translation)
-                            lyr.metadata.set(wms_item_alias, item_translation)
+                            lyr.metadata.set(gml_item_alias, xmlnamify(item_translation))
+                            lyr.metadata.set(wms_item_alias, xmlnamify(item_translation))
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
