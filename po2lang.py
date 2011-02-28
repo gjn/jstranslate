@@ -201,6 +201,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         
                     lyr.opacity = opacity
                     lyr.transparency = transparency
+                    # No template (not queryable by default) 
+                    lyr.template = None
 
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
@@ -208,6 +210,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                              lyr.metadata.set('gml_include_items', gml_include_items)
                              #item value contains sometime invalid character
                              lyr.metadata.set('wms_include_items', gml_include_items)
+                             # Queryable
+                             lyr.template = 'GetFeatureInfo'
     
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
@@ -228,8 +232,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['datasource'] )
                     # Status
                     lyr.status = mapscript.MS_OFF
-                    # Template (queryable) 
-                    lyr.template = 'ttt'
                     
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
