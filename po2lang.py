@@ -208,7 +208,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                     lyr.opacity = opacity
                     lyr.transparency = transparency
                     # No template (not queryable by default) 
-                    lyr.template = None
+                    lyr.template = 'ttt' # How do we know if it is queryable None
 
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
