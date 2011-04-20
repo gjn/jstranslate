@@ -143,7 +143,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
         print "Languages: ", ",".join(langs)
 
     if map:
-        max_extent = map.getMetaData("wms_extent") or MAX_EXTENT 
+        try:
+            max_extent = map.getMetaData("wms_extent")
+        except:
+            max_extent = MAX_EXTENT 
         print "Max extent", max_extent
         for lang in langs:
 
