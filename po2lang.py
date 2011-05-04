@@ -203,7 +203,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                 lyr = clone_map.getLayer(i)
                 if lyr:
                     # Layer stuff and fixing
-                    if lyr.name == WATERMARK_LAYERNAME:
+                    if lyr.name == WATERMARK_LAYERNAME or project != 'wms-bod' :
                         opacity = transparency = lyr.opacity
                     else:
                         opacity = transparency = 100
