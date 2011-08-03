@@ -5,7 +5,7 @@ import os , sys
 # getting path for the input-file empty.js
 try:
     if len(sys.argv) != 2:
-         print "You have to specify the Path to the directory i18n containing empty.js"
+         print "You have to specify the path to the directory i18n containing empty.js"
          print "python translation2js.py <path to directory i18n>"
          sys.exit()
     Path2emptyjs = sys.argv[1]
@@ -66,7 +66,7 @@ register_type(UNICODE)
 conn.set_client_encoding('UTF8')
 
 # Create a multinensional array [lang][msg-ud]  Example: translationDict["it"]["zoomin"]
-translationDict = Ddict(dict)
+translationDict = {}
 
 for lang in config['langs']:
 
@@ -76,7 +76,7 @@ for lang in config['langs']:
     rows = cur.fetchall()
 
     for row in rows:
-        translationDict[lang][row["msg_id"]] = row[lang]
+        translationDict[row["msg_id"].encode('latin-1','ignore')] = row[lang]
 
 
 # Parsing the file empty.js and write msgids into var_arr
@@ -107,29 +107,32 @@ for lang in config["langs"]:
     file_langjs.write("/*global OpenLayers:true*/\n\n/**\n * @requires OpenLayers/Lang/" + lang + ".js\n */\n\nOpenLayers.Util.extend(OpenLayers.Lang." + lang + ", {\n\n\t//Globals\n")
 
     int_counter = 1
+    isTodo = ''
     var_arr.sort()
     for var_msgid in var_arr:
-        if int_counter < len(var_arr):
-            try:
-                print "\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\',\n"
-                file_langjs.write("\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\',\n")
-            except:
-                print "\t'" + var_msgid + "':\'" + var_msgid + "\', //TODO\n"
-                file_langjs.write("\t'" + var_msgid + "':\'" + var_msgid + "\', //TODO\n")
+        try:
+            print var_msgid
+            myString = "\t'" + var_msgid + "':\'" + translationDict[var_msgid.encode('latin-1','ignore')].replace("'","\\\'") + "\'"
+            file_langjs.write(myString.encode('utf-8'))
+            isTodo = ''
+        except:
+            file_langjs.write("\t'" + var_msgid + "':\'" + var_msgid + "\'")
+            isTodo = ' //TODO'
 
-        # the last entry and footer
+        if (int_counter < len(var_arr)):
+            nextLine = ','
         else:
-            try:
-                print "\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\n});"
-                file_langjs.write("\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\n});")
-            except:
-                print "\t'" + var_msgid + "':\'" + var_msgid + "\' //TODO\n});"
-                file_langjs.write("\t'" + var_msgid + "':\'" + var_msgid + "\' //TODO\n});")
+            nextLine = ''
 
-
+        file_langjs.write(nextLine + isTodo + '\n')
         int_counter += 1
 
+     # Writing header
+    file_langjs.write("});");
+
     file_langjs.close()
+
+
 
 
 
