@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os , sys
+from django.utils.encoding import smart_str, smart_unicode
 
 # getting path for the input-file empty.js
 try:
@@ -76,7 +77,7 @@ for lang in config['langs']:
     rows = cur.fetchall()
 
     for row in rows:
-        translationDict[row["msg_id"].encode('latin-1','ignore')] = row[lang]
+        translationDict[smart_str(row["msg_id"])] = row[lang]
 
 
 # Parsing the file empty.js and write msgids into var_arr
@@ -112,7 +113,7 @@ for lang in config["langs"]:
     for var_msgid in var_arr:
         try:
             print var_msgid
-            myString = "\t'" + var_msgid + "':\'" + translationDict[var_msgid.encode('latin-1','ignore')].replace("'","\\\'") + "\'"
+            myString = "\t'" + var_msgid + "':\'" + translationDict[smart_str(var_msgid)].replace("'","\\\'") + "\'"
             file_langjs.write(myString.encode('utf-8'))
             isTodo = ''
         except:
