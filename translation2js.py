@@ -111,20 +111,20 @@ for lang in config["langs"]:
     for var_msgid in var_arr:
         if int_counter < len(var_arr):
             try:
-                print var_msgid + translationDict[lang][var_msgid]
-                file_langjs.write("\t'" + var_msgid + "':\"" + translationDict[lang][var_msgid].replace("'","`") + "\",\n")
+                print "\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\',\n"
+                file_langjs.write("\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\',\n")
             except:
-                print var_msgid + " //TODO"
-                file_langjs.write("\t'" + var_msgid + "':\"" + var_msgid + "\", //TODO\n")
+                print "\t'" + var_msgid + "':\'" + var_msgid + "\', //TODO\n"
+                file_langjs.write("\t'" + var_msgid + "':\'" + var_msgid + "\', //TODO\n")
 
         # the last entry and footer
         else:
             try:
-                print var_msgid + translationDict[lang][var_msgid]
-                file_langjs.write("\t'" + var_msgid + "':\"" + translationDict[lang][var_msgid].replace("'","`") + "\n});")
+                print "\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\n});"
+                file_langjs.write("\t'" + var_msgid + "':\'" + translationDict[lang][var_msgid].replace("'","`") + "\n});")
             except:
-                print var_msgid + " //TODO"
-                file_langjs.write("\t'" + var_msgid + "':\"" + var_msgid + "\" //TODO\n});")
+                print "\t'" + var_msgid + "':\'" + var_msgid + "\' //TODO\n});"
+                file_langjs.write("\t'" + var_msgid + "':\'" + var_msgid + "\' //TODO\n});")
 
 
         int_counter += 1
