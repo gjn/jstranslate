@@ -102,7 +102,10 @@ for lang in config["langs"]:
         sys.exit()
 
     # Writing header
-    file_langjs.write("/*global OpenLayers:true*/\n\n/**\n * @requires OpenLayers/Lang/" + lang + ".js\n */\n\nOpenLayers.Util.extend(OpenLayers.Lang." + lang + ", {\n\n\t//Globals\n")
+    if lang == 'rm':
+        file_langjs.write("/*global OpenLayers:true*/\n\nOpenLayers.Lang." + lang + "= {\n\n\t//Globals\n")
+    else:
+        file_langjs.write("/*global OpenLayers:true*/\n\n/**\n * @requires OpenLayers/Lang/" + lang + ".js\n */\n\nOpenLayers.Util.extend(OpenLayers.Lang." + lang + ", {\n\n\t//Globals\n")
 
     int_counter = 1
     isTodo = ''
@@ -125,7 +128,10 @@ for lang in config["langs"]:
         int_counter += 1
 
      # Writing header
-    file_langjs.write("});");
+    if lang=='rm':
+        file_langjs.write("};");
+    else:
+        file_langjs.write("});");
 
     file_langjs.close()
 
