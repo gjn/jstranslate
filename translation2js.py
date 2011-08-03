@@ -1,9 +1,6 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys, subprocess
-
-from datetime import datetime
+import os , sys
 
 try:
     import yaml
@@ -27,6 +24,15 @@ except ImportError:
 
 print "Translating... "
 
+class Ddict(dict):
+    def __init__(self, default=None):
+        self.default = default
+
+    def __getitem__(self, key):
+        if not self.has_key(key):
+            self[key] = self.default()
+        return dict.__getitem__(self, key)
+
 try:
     f = open('translation2js.yaml', 'r')
     yml = f.read()
@@ -48,13 +54,18 @@ except:
 register_type(UNICODE)
 conn.set_client_encoding('UTF8')
 
+# Create a multinensional array [lang][msg-ud]  Example: translationDict["it"]["zoomin"]
+translationDict = Ddict(dict)
+
 for lang in config['langs']:
+
     cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     cur.execute(config['sql'])
 
     rows = cur.fetchall()
 
-    r = {}
     for row in rows:
-        print row["msgid"]
+        translationDict[lang][row["msg_id"]] = row[lang]
+
+
 
