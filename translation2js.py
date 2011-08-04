@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+"""
+translation2js.py
+This script is used to translate the {lang}.js-files of CHSDI (more about CHSDI: https://redmine.bgdi.admin.ch/projects/mf-chsdi). The scripts uses the content of the table bod.translations
+to generate the {lang}.js-files.
+
+Autor: Cédric Moullet, Tobias Reber
+Version: 0.7
+Usage: /home/ltret/chsdi/buildout/bin/python translation2js.py /home/ltret/chsdi/chsdi/public/GeoAdmin.ux/i18n/ 
+"""
 
 import os, sys, codecs
 
@@ -83,6 +92,7 @@ try:
 except:
     print "is the path to the directory i18n correct?"
     sys.exit()
+
 var_arr = []
 for line in file_emptyjs:
     int_begin = line.find("'") + 1
@@ -90,11 +100,9 @@ for line in file_emptyjs:
     if (int_begin > 0) and (int_end > 0):
         var_arr.append(line[int_begin:int_end])
 
-
 # Writing the translated files
 for lang in config["langs"]:
     print "Writing: " + lang + ".js"
-    print "------------------------"
     try:
         file_langjs = open(Path2emptyjs + lang + '.js','w')
     except:
@@ -127,7 +135,7 @@ for lang in config["langs"]:
         file_langjs.write(nextLine + isTodo + '\n')
         int_counter += 1
 
-     # Writing header
+     # Writing footer
     if lang=='rm':
         file_langjs.write("};");
     else:
@@ -135,6 +143,8 @@ for lang in config["langs"]:
 
     file_langjs.close()
 
+# Finishing
+print "Translation accomplished. Verify the generated {lang}.js.files in " + Path2emptyjs 
 
 
 
