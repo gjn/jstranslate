@@ -17,7 +17,7 @@ except ImportError:
     print 'You need PyYaml. Try \'easy_install pyyaml\''
     sys.exit()
 try:
-    f = open('translation2jspo.yaml', 'r')
+    f = open(__file__.replace('py','yaml'),'r')
     yml = f.read()
 except:
     print "Critical error: Cannot read config file. Exit"
@@ -93,7 +93,7 @@ for lang in config['langs']:
 
 # parsing the file empty.js and write msgids into var_arr
 try:
-    file_emptypo = codecs.open(Path2emptypo + config['emptyPOFilename'],'r', 'utf-8')
+    file_emptypo = codecs.open(Path2emptypo + config['emptyFilename'],'r', 'utf-8')
 except:
     print 'is the path to the directory i18n correct?'
     sys.exit()
