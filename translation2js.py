@@ -53,7 +53,7 @@ class Ddict(dict):
         return dict.__getitem__(self, key)
 
 try:
-    f = open(__file__.replace('py','yaml'), 'r')
+    f = open('translation2jspo.yaml', 'r')
     yml = f.read()
 except:
     print "Critical error: Cannot read config file. Exit"
