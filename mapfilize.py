@@ -15,20 +15,18 @@ except ImportError:
 
 projdir = os.path.abspath(os.path.join('..',os.path.dirname(__file__)))
 
-
 class Mapfilize():
 	
 	layers = []
 	
 	tplvars = None
+        project = ''	
 	
-	project = 'wms-bgdi'
-	
-	project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
-	
-	def __init__(self):
+	def __init__(self, project):
+                self.project = project 
 		self.connect()
 		self.initLayers()
+	        self.project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
 		
 	def connect(self):
 		try:
@@ -40,8 +38,10 @@ class Mapfilize():
 	
 	def initLayers(self):
 		cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        	cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%wms-bgdi%' ORDER BY 'ch.'||split_part(fk_id_dataset,'.',2)||'.' DESC ,sort_key DESC")
-
+                if self.project == 'wms-swisstopowms':
+        		cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%" + self.project + "%' ORDER BY sort_key DESC")
+                else:
+        		cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%" + self.project + "%' ORDER BY 'ch.'||split_part(fk_id_dataset,'.',2)||'.' DESC ,sort_key DESC")
         	for row in  cur.fetchall():
 		
 			self.layers.append(row['fk_id_dataset'])
@@ -71,9 +71,10 @@ class Mapfilize():
 
 
 if __name__ == '__main__':
-    newMapfile = Mapfilize()
-    #print newWMS.layers
-    newMapfile.writeMapfile()
-    
-
+    if not sys.argv[1:]:
+        sys.stdout.write("Sorry, you must specify one argument, for instance wms-bgdi")
+        sys.exit(0)
+    else:
+        newMapfile = Mapfilize(sys.argv[1])
+        newMapfile.writeMapfile()
 
