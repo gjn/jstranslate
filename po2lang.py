@@ -325,6 +325,11 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             
       
             s = iso2utf(open(localized_mapfilename).read())
+
+            # wms-swistopowms: remove _tilecache
+            if project == 'wms-swisstopowms':
+            	s = s.replace("_tilecache", "") 
+        
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)
 
