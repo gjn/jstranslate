@@ -330,6 +330,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             # wms-swistopowms: remove _tilecache
             if project == 'wms-swisstopowms':
             	s = s.replace("_tilecache", "") 
+		s = s.replace("'","´")
         
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)
