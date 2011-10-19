@@ -229,8 +229,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         group_id  = bodDict['layers'][lyr.name]['group_id']
                         if group_id:
                             lyr.group = group_id
-                            lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')))
-                            lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.name+'.wms_group_abstract')))
+                            lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')).replace("'","`"))
+                            lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.name+'.wms_group_abstract')).replace("'","`"))
 
                             
                             
