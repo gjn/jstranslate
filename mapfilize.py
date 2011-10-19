@@ -30,7 +30,7 @@ class Mapfilize():
 		
 	def connect(self):
 		try:
-   			self.conn=psycopg2.connect("dbname='bod' user='www-data' password='www-data' port=5432 host='localhost'")
+   			self.conn=psycopg2.connect("dbname='bod' user='www-data' password='www-data' port=5432 host='bgdipg01t.lt.admin.ch'")
    			print "Database connection established"
 		except:
    			print "Critical Error: Unable to connect to the database. Exit"
