@@ -195,10 +195,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
             clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
             clone_map.web.metadata.set('wms_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
             clone_map.web.metadata.set('wms_title', uni2iso(_(project + '.wms_title')))
+            clone_map.web.metadata.set('ows_enable_request', '*')
             clone_map.defresolution = clone_map.resolution
             if project == 'wms-bgdi':
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
-
 
             for i in range(0, clone_map.numlayers):
                 lyr = clone_map.getLayer(i)
