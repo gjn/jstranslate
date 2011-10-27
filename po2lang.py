@@ -74,6 +74,8 @@ def uni2iso(s):
 
 def xmlnamify(s):
    s = re.sub(r"\[|\]", '', s)
+   s = re.sub(r"\(|\)", '', s)
+   s = re.sub(r"\"|'", '_', s)
    s = re.sub(r"\s+", '_', s)
    return s
 
