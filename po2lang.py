@@ -35,6 +35,7 @@ MINSCALEDENOM = 1
 MAX_EXTENT = "100000 50000 850000 400000"
 
 WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
+WATERMARK_BGDI_LIST = "ch.bazl.watermark,tutu"
 
 
 # Full list
@@ -244,7 +245,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                         lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['datasource'] )
                     # Status
                     lyr.status = mapscript.MS_OFF
-                    
+                   
+                    if lyr.name in WATERMARK_BGDI_LIST.split(",") :
+                        lyr.status=mapscript.MS_DEFAULT
+ 
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
                         lyr.metadata.set("wms_extent", max_extent)
