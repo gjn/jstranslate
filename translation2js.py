@@ -9,7 +9,7 @@ Version: 0.7
 Usage: /home/ltret/chsdi/buildout/bin/python translation2js.py /home/ltret/chsdi/chsdi/public/GeoAdmin.ux/i18n/ 
 """
 
-import os, sys, codecs
+import os, sys, codecs, re
 
 # getting path for the input-file empty.js
 try:
@@ -94,11 +94,13 @@ except:
     sys.exit()
 
 var_arr = []
+pattern = r"""(["'])(\\\1|.*?)\1"""
+
 for line in file_emptyjs:
-    int_begin = line.find("'") + 1
-    int_end = line.rfind("'")
-    if (int_begin > 0) and (int_end > 0):
-        var_arr.append(line[int_begin:int_end])
+    matches = re.findall(pattern, line)
+    if len(matches) == 2:
+        msgid, msgstr = matches
+        var_arr.append(msgid[1].strip(msgid[0]))
 
 # Writing the translated files
 for lang in config["langs"]:
