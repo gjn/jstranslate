@@ -32,6 +32,8 @@ except ImportError:
 
 MAXSCALEDENOM = 100000000
 MINSCALEDENOM = 0
+LABELMAXSCALEDENOM = 2
+LABELMINSCALEDENOM = 1
 MAX_EXTENT = "100000 50000 850000 400000"
 
 WATERMARK_LAYERNAME = "ch.swisstopo.watermark"
@@ -104,6 +106,18 @@ def setScale(object, key='minscaledenom',value=None):
         else:
             setattr(object,key, MINSCALEDENOM)
 
+def setLabelScale(object, key='labelminscaledenom',value=None):
+    """ Default = no label: 
+        if bod value (dataset.ms_label[min|max]scaledenom) is None --> set mapfile LABEL[MIN|MAX]SCALEDENOM value with 1 and 2 => label is never visible
+        if bod value exists --> replace with bod value (=set a defined LABEL[MIN|MAX]SCALEDENOM value)         
+    """
+    if value is None:
+        if key =='labelmaxscaledenom':
+            setattr(object,key, LABELMAXSCALEDENOM)
+        else:
+            setattr(object,key, LABELMINSCALEDENOM)        
+    else:
+        setattr(object,key, int(value))
 
 def convert_to_utf8(filename):
     try:
@@ -228,6 +242,9 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
     
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
+                        if project == 'wms-bod':    
+                            setLabelScale(lyr, key='labelminscaledenom',value= bodDict['layers'][lyr.name]['ms_labelminscaledenom'])
+                            setLabelScale(lyr, key='labelmaxscaledenom',value= bodDict['layers'][lyr.name]['ms_labelmaxscaledenom'])
 
                         group_id  = bodDict['layers'][lyr.name]['group_id']
                         if group_id:
@@ -266,9 +283,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
                             lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
                         else:
                             lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
-                        # No labels
-                        lyr.labelmaxscaledenom = 2.0
-                        lyr.labelminscaledenom = 1.0
                     else:
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
                         lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')).replace("'","`"))
