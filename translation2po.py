@@ -142,11 +142,13 @@ for lang in config["langs"]:
         lang = "rm"
 
     for var_msgid in var_arr:
-        myString += "msgid \"" + var_msgid + "\"\n"
+        myMsgId = "msgid \"" + var_msgid + "\"\n"
         try:
-            myString += "msgstr \"" + translationDict[lang][unicode(var_msgid)] + "\"\n\n"
+            myMsgStr = "msgstr \"" + translationDict[lang][unicode(var_msgid)] + "\"\n\n"
         except:
-            myString += "msgstr \"" + var_msgid + "\" #: TODO\n\n"
+            myMsgStr = "msgstr \"" + var_msgid + "\"\n\n"
+            myString += "#. TODO\n"
+        myString += myMsgId + myMsgStr
 
     if lang == "rm":
         lang = "fi"
