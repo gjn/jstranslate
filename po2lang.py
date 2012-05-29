@@ -142,7 +142,7 @@ def convert_to_utf8(filename):
     finally:
         f.close()
 
-def localizeMapfile(project='wms-bod', langs=['fr','de'], projdir = None):
+def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = None):
     map = None
     domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
