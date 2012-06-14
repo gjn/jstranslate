@@ -70,7 +70,7 @@ def trim(str):
     else:
         return str
 
-def cleanup(name, replace={u'’':'\'',u'–':'-',u'œ':'oe', u'„':'\'', u'“':'\'',u'«':'\'', u'»':'\'', u'μ':'u', u'≤':'<=', u'”':'\'',u'…':'...'  }):
+def cleanup(name, replace={u'’':'\'',u'–':'-',u'œ':'oe', u'„':'\'', u'“':'\'',u'«':'\'', u'»':'\'', u'μ':'u', u'≤':'<=', u'”':'\'',u'…':'...',u'ç':'c'  }):
     if name:
         for k, v in replace.items():
             name = name.replace(k, v)
