@@ -171,17 +171,17 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             max_extent = MAX_EXTENT 
         print "Max extent", max_extent
 
-        # Do not translate the following layers because they are internal wms-bgdi layer
-        # accessible with lang=xx parameter
-        DoNotTranslate = [
-                'org.epsg.grid_4326',
-                'org.epsg.grid_21781'
-                ]
-
-        for deleteLayer in DoNotTranslate:
-            if map.getLayerByName(deleteLayer):
-                print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
-                map.removeLayer(map.getLayerByName(deleteLayer).index)
+        if project == 'wms-bgdi':
+            # Do not translate the following layers because they are internal wms-bgdi layer
+            # accessible with lang=xx parameter
+            DoNotTranslate = [
+                    'org.epsg.grid_4326',
+                    'org.epsg.grid_21781'
+                    ]
+            for deleteLayer in DoNotTranslate:
+                if map.getLayerByName(deleteLayer):
+                    print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
+                    map.removeLayer(map.getLayerByName(deleteLayer).index)
 
         for lang in langs:
 
