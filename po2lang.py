@@ -119,6 +119,11 @@ def setLabelScale(object, key='labelminscaledenom',value=None):
     else:
         setattr(object,key, int(value))
 
+
+def containsAny(str, set):
+    """Check whether 'str' contains ANY of the chars in 'set'"""
+    return 1 in [c in str for c in set]
+
 def convert_to_utf8(filename):
     try:
         f = open(filename,'r')
@@ -165,6 +170,19 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
         except:
             max_extent = MAX_EXTENT 
         print "Max extent", max_extent
+
+        # Do not translate the following layers because they are internal wms-bgdi layer
+        # accessible with lang=xx parameter
+        DoNotTranslate = [
+                'org.epsg.grid_4326',
+                'org.epsg.grid_21781'
+                ]
+
+        for deleteLayer in DoNotTranslate:
+            if map.getLayerByName(deleteLayer):
+                print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
+                map.removeLayer(map.getLayerByName(deleteLayer).index)
+
         for lang in langs:
 
             try:
@@ -194,12 +212,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                 stream.close()
 
 
-
-
             clone_map = map.clone()
             localized_mapfilename = os.path.abspath(os.path.join(project_dir,project + '.' + lang +'.map'))
 
-            
+          
             # mapfile translation
 #            key = clone_map.web.metadata.nextKey(None)
 #            while key is not None:
@@ -217,9 +233,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             if project == 'wms-bgdi':
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
 
+
             for i in range(0, clone_map.numlayers):
+
                 lyr = clone_map.getLayer(i)
-                if lyr:
+
+                if lyr is not None:
                     # Layer stuff and fixing
                     if lyr.name == WATERMARK_LAYERNAME or project != 'wms-bod' :
                         opacity = transparency = lyr.opacity
@@ -242,6 +261,9 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
     
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
+
+
+
                         if project == 'wms-bod':    
                             setLabelScale(lyr, key='labelminscaledenom',value= bodDict['layers'][lyr.name]['ms_labelminscaledenom'])
                             setLabelScale(lyr, key='labelmaxscaledenom',value= bodDict['layers'][lyr.name]['ms_labelmaxscaledenom'])
