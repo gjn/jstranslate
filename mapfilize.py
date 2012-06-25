@@ -40,6 +40,9 @@ class Mapfilize():
 		cur = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
                 if self.project == 'wms-swisstopowms':
         		cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%" + self.project + "%' ORDER BY sort_key DESC")
+                elif self.project == 'wms-bgdi':
+                # only use layers with staging = prod for wms-bgdi
+        		cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms x left join dataset d on x.fk_id_dataset = d.id_dataset WHERE fk_map_name LIKE '%" + self.project + "%' AND d.staging = 'prod' ORDER BY 'ch.'||split_part(fk_id_dataset,'.',2)||'.' DESC ,sort_key DESC")
                 else:
         		cur.execute("SELECT fk_id_dataset FROM xt_dataset_wms WHERE fk_map_name LIKE '%" + self.project + "%' ORDER BY 'ch.'||split_part(fk_id_dataset,'.',2)||'.' DESC ,sort_key DESC")
         	for row in  cur.fetchall():
