@@ -29,7 +29,6 @@ except ImportError:
     from yaml import Loader, Dumper
 
 
-
 MAXSCALEDENOM = 100000000
 MINSCALEDENOM = 0
 LABELMAXSCALEDENOM = 2
@@ -233,7 +232,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             if project == 'wms-bgdi':
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
 
-
             for i in range(0, clone_map.numlayers):
 
                 lyr = clone_map.getLayer(i)
@@ -372,6 +370,9 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             # wms-swistopowms: remove _tilecache
             if project == 'wms-swisstopowms':
             	s = s.replace("_tilecache", "") 
+            
+            if project == 'wms-bgdi':
+                s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 4000\n  CONFIG")
         
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)
