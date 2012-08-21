@@ -29,14 +29,6 @@ except ImportError:
     from yaml import Loader, Dumper
 
 
- 17 Upper Left  (  317000.000,  413000.000)
-  18 Lower Left  (  317000.000,  -87000.000)
-   19 Upper Right ( 1057000.000,  413000.000)
-    20 Lower Right ( 1057000.000,  -87000.000)
-     21 Center      (  687000.000,  163000.000)
-
-
-
 MAXSCALEDENOM = 100000000
 MINSCALEDENOM = 0
 LABELMAXSCALEDENOM = 2
