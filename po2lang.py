@@ -170,7 +170,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             max_extent = MAX_EXTENT 
         print "Max extent", max_extent
 
-        if project == 'wms-bgdi':
+        if project == 'wms-bgdi' or project == 'wms-bod' :
             # Do not translate the following layers because they are internal wms-bgdi layer
             # accessible with lang=xx parameter
             DoNotTranslate = [
@@ -248,6 +248,23 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     # No template (not queryable by default) 
                     lyr.template = 'ttt' # How do we know if it is queryable None
 
+                    #
+                    #if lyr.name == 'ch.bfe.sachplan-geologie-tiefenlager_planning':
+                    #    print "DEBUG: %s Classes in layer %s" % (lyr.numclasses,lyr.name)
+                    #    for c in range(0,lyr.numclasses):
+                    #        print "%s Class with %s styles" % (lyr.getClass(c).name,lyr.getClass(c).numstyles)
+                    #        for s in range(0,lyr.getClass(c).numstyles):
+                    #            update = "GEOMTRANSFORM (buffer([shape],-4))"
+                    #            update = "(buffer([shape],-4))"
+                    #            update = "bbox"
+                    #            if lyr.getClass(c).getStyle(s).getGeomTransform():
+                    #                #clone_map.getLayer(i).getClass(c).getStyle(s).setGeomTransform(str(lyr.getClass(c).getStyle(s).getGeomTransform()))
+                    #                #print "GEOMTRANSFORM %s" % lyr.getClass(c).getStyle(s).getGeomTransform()
+                    #                #clone_map.getLayer(i).getClass(c).getStyle(s).updateFromString("GEOMTRANSFORM %s" % lyr.getClass(c).getStyle(s).getGeomTransform())
+                    #                print update
+                    #                #clone_map.getLayer(i).getClass(c).getStyle(s).updateFromString(update)
+                    #                clone_map.getLayer(i).getClass(c).getStyle(s).setGeomTransform(update)
+
                     if lyr.name in bodDict['layers'].keys():
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
                         if gml_include_items:
@@ -285,11 +302,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                    
                     if lyr.name in WATERMARK_BGDI_LIST.split(",") :
                         lyr.status=mapscript.MS_DEFAULT
- 
+                    print "Layer Metadata: %s - %s" % (lyr.name,lyr.metadata.get("wms_extent")) 
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
-                        lyr.metadata.set("wms_extent", max_extent)
-
+                        lyr.metadata.set("wms_extent", max_extent.strip())
+                    else:
+                        lyr.metadata.set("wms_extent", extent.strip())
 
                     if project == 'wms-bod':
                         # layer translation, if group take title and absctract from group
