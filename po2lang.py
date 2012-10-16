@@ -172,7 +172,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
         if project == 'wms-bgdi' or project == 'wms-bod' :
             # Do not translate the following layers because they are internal wms-bgdi layer
-            # accessible with lang=xx parameter
+            # and the current mapscript version (6.0.3-1~c2c+1) does not support the grid element
             DoNotTranslate = [
                     'org.epsg.grid_4326',
                     'org.epsg.grid_21781'
@@ -391,6 +391,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             
             if project == 'wms-bgdi':
                 s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 4000\n  CONFIG")
+                s = s.replace("END # MAP","INCLUDE mapfile_include/org.epsg.grid_21781.map\nINCLUDE mapfile_include/org.epsg.grid_4326.map  \nEND # MAP")
         
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)
