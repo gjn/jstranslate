@@ -175,7 +175,11 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             # and the current mapscript version (6.0.3-1~c2c+1) does not support the grid element
             DoNotTranslate = [
                     'org.epsg.grid_4326',
-                    'org.epsg.grid_21781'
+                    'org.epsg.grid_4326_1',
+                    'org.epsg.grid_4326_2',
+                    'org.epsg.grid_21781',
+                    'org.epsg.grid_21781_1',
+                    'org.epsg.grid_21781_2'
                     ]
             for deleteLayer in DoNotTranslate:
                 if map.getLayerByName(deleteLayer):
