@@ -394,7 +394,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             	s = s.replace("_tilecache", "") 
             
             if project == 'wms-bgdi':
-                s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 4000\n  CONFIG")
+                s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 15000\n  CONFIG")
                 s = s.replace('END # MAP','INCLUDE "mapfile_include/org.epsg.grid_21781.map"\nINCLUDE "mapfile_include/org.epsg.grid_4326.map"  \nEND # MAP')
         
             open(localized_mapfilename, 'w').write(s)
