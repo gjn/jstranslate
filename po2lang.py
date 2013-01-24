@@ -173,6 +173,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
         if project == 'wms-bgdi' or project == 'wms-bod' :
             # Do not translate the following layers because they are internal wms-bgdi layer
             # and the current mapscript version (6.0.3-1~c2c+1) does not support the grid element
+            # Known Bug in C Library
+            # http://trac.osgeo.org/mapserver/ticket/1980
             DoNotTranslate = [
                     'org.epsg.grid_4326',
                     'org.epsg.grid_4326_1',
