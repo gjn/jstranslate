@@ -397,7 +397,15 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             
             if project == 'wms-bgdi':
                 s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 15000\n  CONFIG")
-                s = s.replace('END # MAP','INCLUDE "mapfile_include/org.epsg.grid_21781.map"\nINCLUDE "mapfile_include/org.epsg.grid_4326.map"  \nEND # MAP')
+                s = s.replace('END # MAP','')
+                # Append layers which should not be translated 
+                #   these layers have to be added to the DoNotTranslate List in this script
+                #   these layers have to be added to the wms-bgdi.map.mako (otherwise they are not mapfilized to wms-bgdi.map)
+                # ltclm 20130214
+                s += 'INCLUDE "mapfile_include/org.epsg.grid_21781.map"\n'
+                s += 'INCLUDE "mapfile_include/org.epsg.grid_4326.map"\n'
+                s += 'END # MAP'
+                #s = s.replace('END # MAP','INCLUDE "mapfile_include/org.epsg.grid_21781.map"\nINCLUDE "mapfile_include/org.epsg.grid_4326.map"  \nEND # MAP')
         
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)
