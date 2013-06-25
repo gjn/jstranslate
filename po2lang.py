@@ -302,7 +302,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                               if lyr.metadata.get('wms_group_title'):
                                 lyr.metadata.remove('wms_group_title')
 
-                        lyr.metadata.set('dump_source', bodDict['layers'][lyr.name]['datasource'] )
                     # Status
                     lyr.status = mapscript.MS_OFF
                    
