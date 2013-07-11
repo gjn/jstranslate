@@ -179,9 +179,31 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     'org.epsg.grid_4326',
                     'org.epsg.grid_4326_1',
                     'org.epsg.grid_4326_2',
+                    'org.epsg.grid_4326_3',
+                    'org.epsg.grid_4326_4',
+                    'org.epsg.grid_4326_5',
+                    'org.epsg.grid_4326_6',
+                    'org.epsg.grid_4326_7',
+                    'org.epsg.grid_4326_8',
+                    'org.epsg.grid_4326_9',
+                    'org.epsg.grid_4326_10',
+                    'org.epsg.grid_4326_11',
+                    'org.epsg.grid_4326_12',
+                    'org.epsg.grid_4326_13',
                     'org.epsg.grid_21781',
                     'org.epsg.grid_21781_1',
-                    'org.epsg.grid_21781_2'
+                    'org.epsg.grid_21781_2',
+                    'org.epsg.grid_21781_3',
+                    'org.epsg.grid_21781_4',
+                    'org.epsg.grid_21781_5',
+                    'org.epsg.grid_21781_6',
+                    'org.epsg.grid_21781_7',
+                    'org.epsg.grid_21781_8',
+                    'org.epsg.grid_21781_9',
+                    'org.epsg.grid_21781_10',
+                    'org.epsg.grid_21781_11',
+                    'org.epsg.grid_21781_12',
+                    'org.epsg.grid_21781_13'
                     ]
             for deleteLayer in DoNotTranslate:
                 if map.getLayerByName(deleteLayer):
@@ -394,7 +416,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             if project == 'wms-swisstopowms':
             	s = s.replace("_tilecache", "") 
             
-            if project == 'wms-bgdi':
+            if project == 'wms-bgdi' or project == 'wms-bod':
                 s = s.replace("MAP\n  CONFIG","MAP\n  MAXSIZE 15000\n  CONFIG")
                 s = s.replace('END # MAP','')
                 # Append layers which should not be translated 
