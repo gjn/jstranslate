@@ -205,11 +205,13 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     'org.epsg.grid_21781_12',
                     'org.epsg.grid_21781_13'
                     ]
+
+            print "%s layers found in mapfile ..." % map.numlayers
             for deleteLayer in DoNotTranslate:
                 if map.getLayerByName(deleteLayer):
-                    print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
+                    #print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
                     map.removeLayer(map.getLayerByName(deleteLayer).index)
-
+        print "%s layers will be translated..." % map.numlayers
         for lang in langs:
 
             try:
@@ -294,7 +296,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             setLabelScale(lyr, key='labelminscaledenom',value= bodDict['layers'][lyr.name]['ms_labelminscaledenom'])
                             setLabelScale(lyr, key='labelmaxscaledenom',value= bodDict['layers'][lyr.name]['ms_labelmaxscaledenom'])
                         
-                        print "processing layer %s with group %s" % (lyr.name,lyr.group)
                         group_id  = bodDict['layers'][lyr.name]['group_id']
                         if group_id:
                             lyr.group = group_id
@@ -308,7 +309,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     # (usecase/hack: several layers in one snippet) 
                     # if layer id is not in bod but group tag is in bod take translation from group
                     elif lyr.group in bodDict['layers'].keys():
-                        print "special translation for layer %s" % lyr.name
+                        print "No bod entry for this layer %s (using group infos for translation: %s)  ..." % (lyr.name,lyr.group)
                         lyr.metadata.set('wms_group_title', uni2iso(_(lyr.group+'.wms_title')).replace("'","`"))
                         lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.group+'.wms_abstract')).replace("'","`"))
 
@@ -318,7 +319,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                    
                     if lyr.name in WATERMARK_BGDI_LIST.split(",") :
                         lyr.status=mapscript.MS_DEFAULT
-                    print "Layer Metadata: %s - %s" % (lyr.name,lyr.metadata.get("wms_extent")) 
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
                         lyr.metadata.set("wms_extent", max_extent.strip())
@@ -384,7 +384,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
                             #print "klassid=%s, klass.name=%s" % (klassid,klass.name)
                             klassname = klassid + ".name"
-                            print klassname
                             #print "CLASS, id=%s" % klassname
                             klass.name =uni2iso( _(klassname))  #.encode('ascii','replace')))
                             #if klassname == klass.name:
@@ -393,7 +392,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     # delete name from layer if there is no translation in the bod for layer->name or layer->group 
                     # only for wms-bgdi
                     if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys():
-                        print "No translation available for this layer %s (Group in mapfile: %s)  ..." % (lyr.name,lyr.group)
+                        print "No bod entry for this layer %s, layer name will be removed ..." % (lyr.name)
                         # save original layer id in wms_title attribute
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
                         lyr.name = None
