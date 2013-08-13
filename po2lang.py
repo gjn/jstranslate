@@ -264,6 +264,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
                 lyr = clone_map.getLayer(i)
 
+                #if lyr is not None and 'ch.babs.kulturgueter' in lyr.name:
                 if lyr is not None:
                     # Layer stuff and fixing
                     if lyr.name == WATERMARK_LAYERNAME or project != 'wms-bod' :
@@ -289,22 +290,28 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
 
 
-
-
                         if project == 'wms-bod':    
                             setLabelScale(lyr, key='labelminscaledenom',value= bodDict['layers'][lyr.name]['ms_labelminscaledenom'])
                             setLabelScale(lyr, key='labelmaxscaledenom',value= bodDict['layers'][lyr.name]['ms_labelmaxscaledenom'])
-
+                        
+                        print "processing layer %s with group %s" % (lyr.name,lyr.group)
                         group_id  = bodDict['layers'][lyr.name]['group_id']
                         if group_id:
                             lyr.group = group_id
                             lyr.metadata.set('wms_group_title', uni2iso(_(lyr.name+'.wms_group_title')).replace("'","`"))
                             lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.name+'.wms_group_abstract')).replace("'","`"))
-
                         else:
-                              lyr.group = None
-                              if lyr.metadata.get('wms_group_title'):
+                            lyr.group = None
+                            if lyr.metadata.get('wms_group_title'):
                                 lyr.metadata.remove('wms_group_title')
+
+                    # (usecase/hack: several layers in one snippet) 
+                    # if layer id is not in bod but group tag is in bod take translation from group
+                    elif lyr.group in bodDict['layers'].keys():
+                        print "special translation for layer %s" % lyr.name
+                        lyr.metadata.set('wms_group_title', uni2iso(_(lyr.group+'.wms_title')).replace("'","`"))
+                        lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.group+'.wms_abstract')).replace("'","`"))
+
 
                     # Status
                     lyr.status = mapscript.MS_OFF
@@ -383,14 +390,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             #if klassname == klass.name:
                             #   print "Missing translation for", klassname
 
-
-                    # delete name from layer and hide in getcapabilities document 
-                    # if there is no translation in the bod 
+                    # delete name from layer if there is no translation in the bod for layer->name or layer->group 
                     # only for wms-bgdi
-                    if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys():
+                    if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys() and not lyr.group in bodDict['layers']:
                         print "No translation available for this layer %s (Group in mapfile: %s)  ..." % (lyr.name,lyr.group)
+                        # save original layer id in wms_title attribute
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
-                        #lyr.metadata.set('wms_enable_request', uni2iso('* !GetCapabilities'))
                         lyr.name = None
 
             if os.path.exists(localized_mapfilename):
