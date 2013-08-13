@@ -392,7 +392,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
                     # delete name from layer if there is no translation in the bod for layer->name or layer->group 
                     # only for wms-bgdi
-                    if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys() and not lyr.group in bodDict['layers']:
+                    if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys():
                         print "No translation available for this layer %s (Group in mapfile: %s)  ..." % (lyr.name,lyr.group)
                         # save original layer id in wms_title attribute
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
