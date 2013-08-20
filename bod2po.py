@@ -107,7 +107,6 @@ for lang in config['langs']:
         print "---------------------"
         field_id = config['tables'][proj]['id']
         pg_table = config['tables'][proj]['table']
-        
 
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute(config['tables'][proj]['sql'])
@@ -116,15 +115,11 @@ for lang in config['langs']:
 
         r = {}
         for row in rows:
-            #print row
             for field in config['tables'][proj]['fields']:
                 field_name = field + '_' + lang
                 field_value = row[field_name]
                 id = row[field_id]
                 print "Adding", id
-
-
-
                 raw_string = cleanup(trim(field_value))
                 if raw_string:
                     try:

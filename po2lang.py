@@ -244,14 +244,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             clone_map = map.clone()
             localized_mapfilename = os.path.abspath(os.path.join(project_dir,project + '.' + lang +'.map'))
 
-          
-            # mapfile translation
-#            key = clone_map.web.metadata.nextKey(None)
-#            while key is not None:
-#                value = clone_map.web.metadata.get(key)
-#                clone_map.web.metadata.set(key, value ) #uni2iso(value))
-#                key = clone_map.web.metadata.nextKey(key)
-                
             # clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
             clone_map.web.metadata.set('wms_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
             clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
@@ -266,7 +258,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
                 lyr = clone_map.getLayer(i)
 
-                #if lyr is not None and 'ch.babs.kulturgueter' in lyr.name:
                 if lyr is not None:
                     # Layer stuff and fixing
                     if lyr.name == WATERMARK_LAYERNAME or project != 'wms-bod' :
@@ -291,7 +282,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         setScale(lyr, key='minscaledenom',value= bodDict['layers'][lyr.name]['ms_minscaledenom'])
                         setScale(lyr, key='maxscaledenom',value= bodDict['layers'][lyr.name]['ms_maxscaledenom'])
 
-
                         if project == 'wms-bod':    
                             setLabelScale(lyr, key='labelminscaledenom',value= bodDict['layers'][lyr.name]['ms_labelminscaledenom'])
                             setLabelScale(lyr, key='labelmaxscaledenom',value= bodDict['layers'][lyr.name]['ms_labelmaxscaledenom'])
@@ -305,14 +295,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             lyr.group = None
                             if lyr.metadata.get('wms_group_title'):
                                 lyr.metadata.remove('wms_group_title')
-
-                    # (usecase/hack: several layers in one snippet) 
-                    # if layer id is not in bod but group tag is in bod take translation from group
-                    elif lyr.group in bodDict['layers'].keys():
-                        print "No bod entry for this layer %s (using group infos for translation: %s)  ..." % (lyr.name,lyr.group)
-                        lyr.metadata.set('wms_group_title', uni2iso(_(lyr.group+'.wms_title')).replace("'","`"))
-                        lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.group+'.wms_abstract')).replace("'","`"))
-
 
                     # Status
                     lyr.status = mapscript.MS_OFF
@@ -341,7 +323,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
                         lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')).replace("'","`"))
                         lyr.metadata.set('wms_srs', WMS_SRS)
-
+                        
 
                         maxscaledenom = lyr.maxscaledenom
                         if maxscaledenom < 0:
@@ -349,10 +331,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         minscaledenom = lyr.minscaledenom
                         if minscaledenom < 0:
                             lyr.minscaledenom = MINSCALEDENOM
-
-                    # print  t(lyr.name+'.title')
-                    # print _(lyr.name+'.abstract')
-
 
                     items = lyr.metadata.get("gml_include_items")
                     if items:
@@ -373,29 +351,38 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                                 setScale(klass, key='minscaledenom',value= bodDict['classes'][klassid]['ms_minscaledenom'])
                                 setScale(klass, key='maxscaledenom',value= bodDict['classes'][klassid]['ms_maxscaledenom'])
 
-
                             klass.opacity = opacity
                             klass.transparency = transparency
-
-                            #klassname = lyr.name + "." + klass.name.decode('utf-8','replace') + ".name"
-                            # ch.swisstopo.vec200-names-namedlocation.Tunnel.name
-                            # ch.swisstopo.vec25-heckenbaeume-linien.Hecke.name
-                            # klassid=ch.swisstopo.vec25-heckenbaeume_linien.Hecke, klass.name=Hecke
-
-                            #print "klassid=%s, klass.name=%s" % (klassid,klass.name)
                             klassname = klassid + ".name"
-                            #print "CLASS, id=%s" % klassname
                             klass.name =uni2iso( _(klassname))  #.encode('ascii','replace')))
-                            #if klassname == klass.name:
-                            #   print "Missing translation for", klassname
 
-                    # delete name from layer if there is no translation in the bod for layer->name or layer->group 
-                    # only for wms-bgdi
-                    if project == 'wms-bgdi' and lyr.group != None and not lyr.name in bodDict['layers'].keys():
-                        print "No bod entry for this layer %s, layer name will be removed ..." % (lyr.name)
-                        # save original layer id in wms_title attribute
-                        lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
-                        lyr.name = None
+                    if project == 'wms-bgdi':
+                        # layer / group translations
+                        # if layer is not (translated) in bod and layer is not hidden in getcap
+                        if not lyr.name in bodDict['layers'].keys() and (lyr.metadata.get('wms_enable_request') is None or lyr.metadata.get('wms_enable_request').find('!GetCapabilities') == -1):
+                            # state 1: No translation for standard Layer without group id in mapfile
+                            if lyr.group is None:
+                                print "state 1: No bod entry for this layer %s, layer name will be tagged ..." % (lyr.name)
+                                print lyr.metadata.get('wms_enable_request')
+                                # save original layer id in wms_title attribute
+                                lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.name = None
+                            # state 2:
+                            # group is translated in bod
+                            # multiple technical layers in one snippet, only group entry in bod
+                            # tag layers
+                            elif lyr.group in bodDict['layers'].keys():
+                                print "state 2: No bod entry for this layer %s (using group infos instead for translation: %s)  ..." % (lyr.name,lyr.group)
+                                lyr.metadata.set('wms_group_title', uni2iso(_(lyr.group+'.wms_title')).replace("'","`"))
+                                lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.group+'.wms_abstract')).replace("'","`"))
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.name = None
+                            else:
+                                # state 3: no translation available for layer and for group, tag layer remove layer name
+                                print "state 3: no valid group found in layer '%s', group id in mapfile '%s'" % (lyr.name,lyr.group)
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.name = None
 
             if os.path.exists(localized_mapfilename):
                 value = raw_input("Overwrite %s ? [y,n]" % localized_mapfilename)

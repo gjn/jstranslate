@@ -28,22 +28,6 @@ tables:
     grp_abstract: wms_group_abstract
     sql: SELECt * FROM view_dataset_translation
 
-  groups:
-    table: dataset_group
-    fields: [kurzbezeichnung,frm_abstract]
-    id: id_dataset_group
-    kurzbezeichnung: wms_group_title
-    frm_abstract: wms_group_abstract
-    sql: SELECT id  as id_seq, id_dataset as id_dataset_group, projekte, kurzbezeichnung_de, kurzbezeichnung_fr, 
-       kurzbezeichnung_it, kurzbezeichnung_en, kurzbezeichnung_rm, frm_bezeichnung_de, 
-       frm_bezeichnung_fr, frm_bezeichnung_it, frm_bezeichnung_en, frm_bezeichnung_rm, 
-       frm_abstract_de, frm_abstract_fr, frm_abstract_it, frm_abstract_en, 
-       frm_abstract_rm, frm_scale_limit, fk_geobasisdaten_sammlung_bundesrecht, 
-       fk_geocat, bgdi_modified, bgdi_created, bgdi_modified_by, bgdi_created_by, 
-       frm_url, url_download, url_portale, b1_nutzungsbedingungen, comment, 
-       staging, bodsearch, bgdi_id, download
-       FROM dataset WHERE id_dataset in (SELECT parent_id from dataset);
-
   wms:
     table: wms_metadata
     fields: [title,abstract,name]
