@@ -267,7 +267,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             if 'wms-ga-one' in project:
                 # remove wms_xxx from WEB Section
                 clone_map.web.metadata.set('ows_title', uni2iso(_(project + '.wms_title')))
-                clone_map.web.metadata.set('ows_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
+                clone_map.web.metadata.set('ows_abstract', uni2iso(_( project +'.wms_abstract').replace('\n', '').replace('\r', '') + " (Revision: %s)" % proj_version))
                 clone_map.web.metadata.set('ows_encoding', bodDict['wms'][project]['encoding'])
                 clone_map.web.metadata.set('ows_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
                 clone_map.web.metadata.set('ows_keywords', uni2iso(_(project + '.ows_keywords')))                
