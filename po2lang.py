@@ -150,6 +150,20 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
     map = None
     domain = project
     project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', project))
+
+    # Exceptions
+    # wms-ga-onegeologyeurope only de, en
+    if project == 'wms-ga-onegeologyeurope':
+        langs=['de','en']
+
+    # wms-ga-onegeology only de, fr
+    if project == 'wms-ga-onegeology':
+        langs=['de','fr']
+    
+    if 'wms-ga-one' in project:
+        print "special processing wms-ga"
+        project_dir = os.path.abspath(os.path.join(os.curdir,'..','services', 'wms-ga'))
+
     proj_version = version.get_svn_revision(project_dir)
     print  "Translating", project
     print "===================="
@@ -167,7 +181,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
         try:
             max_extent = map.getMetaData("wms_extent")
         except:
-            max_extent = MAX_EXTENT 
+            try:
+                max_extent = map.getMetaData("ows_extent")
+            except:
+                max_extent = MAX_EXTENT 
         print "Max extent", max_extent
 
         if project == 'wms-bgdi' or project == 'wms-bod' :
@@ -209,8 +226,9 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
             print "%s layers found in mapfile ..." % map.numlayers
             for deleteLayer in DoNotTranslate:
                 if map.getLayerByName(deleteLayer):
-                    #print "loesche layer %s mit index %s" % (deleteLayer,map.getLayerByName(deleteLayer).index)
                     map.removeLayer(map.getLayerByName(deleteLayer).index)
+
+
         print "%s layers will be translated..." % map.numlayers
         for lang in langs:
 
@@ -243,16 +261,34 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
             clone_map = map.clone()
             localized_mapfilename = os.path.abspath(os.path.join(project_dir,project + '.' + lang +'.map'))
+            
 
-            # clone_map.web.metadata.set('wms_abstract', uni2iso(_('wms-bod.wms_abstract')))
-            clone_map.web.metadata.set('wms_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
-            clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
-            clone_map.web.metadata.set('wms_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
-            clone_map.web.metadata.set('wms_title', uni2iso(_(project + '.wms_title')))
-            clone_map.web.metadata.set('ows_enable_request', '*')
+            # Special Translation for wms-ga-onegeology and wms-ga-onegeologyeurope
+            if 'wms-ga-one' in project:
+                # remove wms_xxx from WEB Section
+                clone_map.web.metadata.set('ows_title', uni2iso(_(project + '.wms_title')))
+                clone_map.web.metadata.set('ows_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
+                clone_map.web.metadata.set('ows_encoding', bodDict['wms'][project]['encoding'])
+                clone_map.web.metadata.set('ows_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
+                clone_map.web.metadata.set('ows_keywords', uni2iso(_(project + '.ows_keywords')))                
+                clone_map.web.metadata.set('ows_keywordlist_GEMET_items', uni2iso(_(project + '.ows_keywordlist_gemet_items')))                
+                clone_map.web.metadata.set('ows_accessconstraints', uni2iso(_(project + '.ows_accessconstraint')))                                
+                clone_map.web.metadata.set('ows_fees', uni2iso(_(project + '.ows_fee')))                                
+                clone_map.web.metadata.set('ows_contactorganization', uni2iso(_(project + '.wms_contactorganization')))                                
+                clone_map.web.metadata.set('ows_contactposition', uni2iso(_(project + '.ows_contactposition')))                                
+                clone_map.web.metadata.set('ows_enable_request', '*')
+            else:
+                # Translate general WMS Service Section
+                clone_map.web.metadata.set('wms_abstract', uni2iso(_( project +'.wms_abstract') + " (Revision: %s)" % proj_version))
+                clone_map.web.metadata.set('wms_encoding', bodDict['wms'][project]['encoding'])
+                clone_map.web.metadata.set('wms_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
+                clone_map.web.metadata.set('wms_title', uni2iso(_(project + '.wms_title')))
+                clone_map.web.metadata.set('ows_enable_request', '*')
             clone_map.defresolution = clone_map.resolution
+
             if project == 'wms-bgdi':
                 clone_map.web.metadata.set('wms_srs', WMS_SRS)
+
 
             for i in range(0, clone_map.numlayers):
 
@@ -407,7 +443,6 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                 s += 'INCLUDE "mapfile_include/org.epsg.grid_21781.map"\n'
                 s += 'INCLUDE "mapfile_include/org.epsg.grid_4326.map"\n'
                 s += 'END # MAP'
-                #s = s.replace('END # MAP','INCLUDE "mapfile_include/org.epsg.grid_21781.map"\nINCLUDE "mapfile_include/org.epsg.grid_4326.map"  \nEND # MAP')
         
             open(localized_mapfilename, 'w').write(s)
             #convert_to_utf8(localized_mapfilename)

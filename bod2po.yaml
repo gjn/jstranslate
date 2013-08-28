@@ -30,9 +30,14 @@ tables:
 
   wms:
     table: wms_metadata
-    fields: [title,abstract,name]
+    fields: [title,abstract,keywords,accessconstraint,fee,ows_keywordlist_gemet_items,name,contactposition]
     id: project
     title: wms_title
     abstract: wms_abstract
     name: wms_contactorganization
-    sql: SELECT substring(pk_map_name from '([a-z_-]+)\.map') AS project, * FROM  wms_metadata AS w  LEFT JOIN contactorganisation  c ON c.pk_contactorganisation_id =w.fk_contactorganisation_id
+    keywords: ows_keywords
+    accessconstraint: ows_accessconstraint
+    fee: ows_fee
+    ows_keywordlist_gemet_items: ows_keywordlist_gemet_items
+    contactposition: ows_contactposition
+    sql: SELECT substring(pk_map_name from '([0-9a-z_-]+)\.map') AS project, * FROM  wms_metadata AS w  LEFT JOIN contactorganisation  c ON c.pk_contactorganisation_id =w.fk_contactorganisation_id
