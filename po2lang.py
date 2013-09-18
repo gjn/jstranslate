@@ -220,7 +220,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     'org.epsg.grid_21781_10',
                     'org.epsg.grid_21781_11',
                     'org.epsg.grid_21781_12',
-                    'org.epsg.grid_21781_13'
+                    'org.epsg.grid_21781_13',
+                    'ch.kantone.historische-topografische-namen'
                     ]
 
             print "%s layers found in mapfile ..." % map.numlayers
