@@ -20,12 +20,13 @@ tables:
     
   layers:
     table: view_dataset_translation
-    fields: [kurzbezeichnung,frm_abstract,grp_kurzbezeichnung,grp_abstract]
+    fields: [kurzbezeichnung,frm_abstract,grp_kurzbezeichnung,grp_abstract,ows_keywordlist]
     id: id_dataset
     kurzbezeichnung: wms_title
     frm_abstract:    wms_abstract
     grp_kurzbezeichnung: wms_group_title
     grp_abstract: wms_group_abstract
+    ows_keywordlist: wms_ows_keywordlist
     sql: SELECt * FROM view_dataset_translation
 
   wms:

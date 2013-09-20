@@ -304,10 +304,13 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         
                     lyr.opacity = opacity
                     lyr.transparency = transparency
-                    # No template (not queryable by default) 
-                    lyr.template = 'ttt' # How do we know if it is queryable None
+                    # No template (not queryable by default)
+                    if 'wms-ga-one' not in project:
+                        lyr.template = 'ttt' # How do we know if it is queryable None
 
+                    # Global Section
                     if lyr.name in bodDict['layers'].keys():
+                        lyr.metadata.set('ows_keywordlist',uni2iso(_(lyr.name+'.wms_ows_keywordlist')))
                         gml_include_items = bodDict['layers'][lyr.name]['gml_include_items']
                         if gml_include_items:
                              lyr.metadata.set('gml_include_items', gml_include_items)
@@ -338,11 +341,24 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                    
                     if lyr.name in WATERMARK_BGDI_LIST.split(",") :
                         lyr.status=mapscript.MS_DEFAULT
+
                     extent = lyr.metadata.get("wms_extent")
                     if not extent:
                         lyr.metadata.set("wms_extent", max_extent.strip())
                     else:
                         lyr.metadata.set("wms_extent", extent.strip())
+
+                    if 'wms-ga-one' in project:
+                        # Layer extent has to be provided by EXTENT Tag in projected Coordinates
+                        # remove wms_extent info from wms-ga-one* Layers
+                        # ltclm 20130920
+                        lyr.metadata.remove('wms_extent')
+                        # ows_keywordlist_vocabulary and ows_keywordlist_XXXX_items are not yet in the bod
+                        # for now this dirty hack is sufficient
+                        # ltclm 20130920
+                        if lang == 'en':
+                            lyr.metadata.set('ows_keywordlist_vocabulary', 'GEMET')
+                            lyr.metadata.set('ows_keywordlist_GEMET_items', 'Geology')
 
                     if project == 'wms-bod':
                         # layer translation, if group take title and absctract from group
@@ -357,9 +373,9 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                         else:
                             lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
                     else:
-                        lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
-                        lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')).replace("'","`"))
-                        lyr.metadata.set('wms_srs', WMS_SRS)
+                        lyr.metadata.set('ows_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
+                        lyr.metadata.set('ows_abstract', uni2iso(_(lyr.name+'.wms_abstract')).replace("'","`"))
+                        lyr.metadata.set('ows_srs', WMS_SRS)
                         
 
                         maxscaledenom = lyr.maxscaledenom
@@ -370,14 +386,19 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             lyr.minscaledenom = MINSCALEDENOM
 
                     items = lyr.metadata.get("gml_include_items")
-                    if items:
-                        for item in items.split(','):
-                            item = item.strip()
-                            gml_item_alias = "gml_%s_alias" % item
-                            wms_item_alias = "wms_%s_alias" % item
-                            item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
-                            lyr.metadata.set(gml_item_alias, xmlnamify(item_translation))
-                            lyr.metadata.set(wms_item_alias, xmlnamify(item_translation))
+                    
+                    # do not translate gml_include_items or wms-ga*
+                    #
+                    if 'wms-ga-one' not in project:
+                        if items:
+                            for item in items.split(','):
+                                item = item.strip()
+                                gml_item_alias = "gml_%s_alias" % item
+                                wms_item_alias = "wms_%s_alias" % item
+                                item_translation = uni2iso(_(lyr.name+'.'+item+'.name'))
+                                lyr.metadata.set(gml_item_alias, xmlnamify(item_translation))
+                                lyr.metadata.set(wms_item_alias, xmlnamify(item_translation))
+
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
@@ -392,6 +413,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             klass.transparency = transparency
                             klassname = klassid + ".name"
                             klass.name =uni2iso( _(klassname))  #.encode('ascii','replace')))
+
 
                     if project == 'wms-bgdi':
                         # layer / group translations
@@ -446,7 +468,8 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                 s += 'END # MAP'
         
             open(localized_mapfilename, 'w').write(s)
-            #convert_to_utf8(localized_mapfilename)
+            #if 'wms-ga-one' in project:
+            #    convert_to_utf8(localized_mapfilename)
 
     else:
         print "Error opening", mapfile_tpl
