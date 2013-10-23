@@ -271,10 +271,10 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                 clone_map.web.metadata.set('ows_abstract', uni2iso(_( project +'.wms_abstract').replace('\n', '').replace('\r', '') + " (Revision: %s)" % proj_version))
                 clone_map.web.metadata.set('ows_encoding', bodDict['wms'][project]['encoding'])
                 clone_map.web.metadata.set('ows_contactorganization', uni2iso(_(project + '.wms_contactorganization')))
-                clone_map.web.metadata.set('ows_keywords', uni2iso(_(project + '.ows_keywords')))                
+                clone_map.web.metadata.set('ows_keywordlist', uni2iso(_(project + '.ows_keywords')))                
                 clone_map.web.metadata.set('ows_keywordlist_GEMET_items', uni2iso(_(project + '.ows_keywordlist_gemet_items')))                
                 clone_map.web.metadata.set('ows_accessconstraints', uni2iso(_(project + '.ows_accessconstraint')))                                
-                clone_map.web.metadata.set('ows_fees', uni2iso(_(project + '.ows_fee')))                                
+                #clone_map.web.metadata.set('ows_fees', uni2iso(_(project + '.ows_fee')))                                
                 clone_map.web.metadata.set('ows_contactorganization', uni2iso(_(project + '.wms_contactorganization')))                                
                 clone_map.web.metadata.set('ows_contactposition', uni2iso(_(project + '.ows_contactposition')))                                
                 clone_map.web.metadata.set('ows_enable_request', '*')
@@ -417,15 +417,15 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
 
                     if project == 'wms-bgdi':
                         # layer / group translations
-                        # if layer is not (translated) in bod and layer is not hidden in getcap
-                        if not lyr.name in bodDict['layers'].keys() and (lyr.metadata.get('wms_enable_request') is None or lyr.metadata.get('wms_enable_request').find('!GetCapabilities') == -1):
+                        # if layer is not (translated) in bod or translation kurzbezeichnung_de is empty and layer is not hidden in getcap 
+                        if (not lyr.name in bodDict['layers'].keys() or not bodDict['layers'][lyr.name]['kurzbezeichnung_de']) and (lyr.metadata.get('wms_enable_request') is None or lyr.metadata.get('wms_enable_request').find('!GetCapabilities') == -1):
                             # state 1: No translation for standard Layer without group id in mapfile
                             if lyr.group is None:
                                 print "state 1: No bod entry for this layer %s, layer name will be tagged ..." % (lyr.name)
                                 print lyr.metadata.get('wms_enable_request')
                                 # save original layer id in wms_title attribute
                                 lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
-                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap,state1')
                                 lyr.name = None
                             # state 2:
                             # group is translated in bod
@@ -435,12 +435,12 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                                 print "state 2: No bod entry for this layer %s (using group infos instead for translation: %s)  ..." % (lyr.name,lyr.group)
                                 lyr.metadata.set('wms_group_title', uni2iso(_(lyr.group+'.wms_title')).replace("'","`"))
                                 lyr.metadata.set('wms_group_abstract', uni2iso(_(lyr.group+'.wms_abstract')).replace("'","`"))
-                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap,state2')
                                 lyr.name = None
                             else:
                                 # state 3: no translation available for layer and for group, tag layer remove layer name
                                 print "state 3: no valid group found in layer '%s', group id in mapfile '%s'" % (lyr.name,lyr.group)
-                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap')
+                                lyr.metadata.set('wms_keywordlist', 'bgdi_hide_getcap,state3')
                                 lyr.name = None
 
             if os.path.exists(localized_mapfilename):

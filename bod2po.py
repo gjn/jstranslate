@@ -123,7 +123,8 @@ for lang in config['langs']:
                 raw_string = cleanup(trim(field_value))
                 if raw_string:
                     try:
-                        cleaned_string = raw_string.encode('iso-8859-1').decode('iso-8859-1')
+                        #cleaned_string = raw_string.encode('iso-8859-1').decode('iso-8859-1')
+                        cleaned_string = raw_string.encode('utf-8').decode('utf-8')
                     except UnicodeEncodeError:
                         msg = u"""\n----ERROR!----\n\nThe string \"%s\"\n\ncontains illegal character(s).\nPlease check the field "%s"\nin table \"%s\"\nwith id=%s (illegal character(s) replaced by '?').\nExit""" % (raw_string,field_name,pg_table,id)
                         print msg.encode('iso-8859-1','replace')
