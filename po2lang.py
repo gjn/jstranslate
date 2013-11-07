@@ -361,17 +361,18 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                             lyr.metadata.set('ows_keywordlist_GEMET_items', 'Geology')
 
                     if project == 'wms-bod':
-                        # layer translation, if group take title and absctract from group
-                        if lyr.group and _(lyr.name+'.wms_title') == lyr.name+'.wms_title':
-                            lyr.metadata.set('wms_title',uni2iso(_(lyr.name+'.wms_group_title')))
-                        else:
-                            lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
-                        #print _(u''+lyr.name+'.title')
-
-                        if lyr.group and _(lyr.name+'.wms_abstract') == lyr.name+'.wms_abstract':
-                            lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
-                        else:
-                            lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
+                        if lyr.name:
+                            # layer translation, if group take title and absctract from group
+                            if lyr.group and _(lyr.name+'.wms_title') == lyr.name+'.wms_title':
+                                lyr.metadata.set('wms_title',uni2iso(_(lyr.name+'.wms_group_title')))
+                            else:
+                                lyr.metadata.set('wms_title', uni2iso(_(lyr.name+'.wms_title')))
+                            #print _(u''+lyr.name+'.title')
+    
+                            if lyr.group and _(lyr.name+'.wms_abstract') == lyr.name+'.wms_abstract':
+                                lyr.metadata.set('wms_abstract',uni2iso(_(lyr.name+'.wms_group_abstract')))
+                            else:
+                                lyr.metadata.set('wms_abstract', uni2iso(_(lyr.name+'.wms_abstract')))
                     else:
                         lyr.metadata.set('ows_title', uni2iso(_(lyr.name+'.wms_title')).replace("'","`"))
                         lyr.metadata.set('ows_abstract', uni2iso(_(lyr.name+'.wms_abstract')).replace("'","`"))
@@ -402,7 +403,7 @@ def localizeMapfile(project='wms-bod', langs=['fr','de','it','en'], projdir = No
                     # Classes stuff and fixing
                     for j in range(0, lyr.numclasses):
                         klass = lyr.getClass(j)
-                        if klass and klass.name:
+                        if klass and klass.name and lyr.name:
                             # Fix scales
                             klassid = lyr.name + "." + klass.name.decode('utf-8','replace')
                             if klassid in bodDict['classes'].keys():
