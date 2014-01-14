@@ -41,4 +41,4 @@ tables:
     fee: ows_fee
     ows_keywordlist_gemet_items: ows_keywordlist_gemet_items
     contactposition: ows_contactposition
-    sql: SELECT substring(pk_map_name from '([0-9a-z_-]+)\.map') AS project, * FROM  wms_metadata AS w  LEFT JOIN contactorganisation  c ON c.pk_contactorganisation_id =w.fk_contactorganisation_id
+    sql: SELECT substring(pk_map_name from '([0-9a-z-]+)_(dev|int|prod)') AS project, * FROM  wms_metadata AS w  LEFT JOIN contactorganisation  c ON c.pk_contactorganisation_id =w.fk_contactorganisation_id
